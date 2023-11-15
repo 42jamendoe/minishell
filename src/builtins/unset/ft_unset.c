@@ -91,20 +91,20 @@ int	ft_validate_arg_unset(char **env)
 int	ft_unset(t_shell *shell, t_cmd *tmp_cmd)
 {
 	char	**new_env;
-	int		list_len;
+	//int		list_len;
 	int		valid_arg;
 
 	if (!tmp_cmd->sim_cmd[1])
 		return (EXIT_SUCCESS);
 	else
 	{
-		list_len = ft_list_lenght(shell);
-		if (!ft_validate_arg_unset(tmp_cmd->sim_cmd) || !list_len)
+		//list_len = ft_list_lenght(shell);
+		if (!ft_validate_arg_unset(tmp_cmd->sim_cmd))
 			return (EXIT_FAILURE);
 		valid_arg = ft_check_list(shell, tmp_cmd->sim_cmd);
 		new_env = ft_build_new_env(shell, tmp_cmd->sim_cmd, valid_arg);
 		free(shell->env);
 		shell->env = new_env;
-		return (0);
+		return (EXIT_SUCCESS);
 	}
 }

@@ -19,7 +19,7 @@ int	ft_pwd(void)
 	current_working_diretory = getcwd(current_working_diretory, 0);
 	if (!current_working_diretory)
 	{
-		ft_putendl_fd("Minishell: Can't figure out cwd\n", STDOUT_FILENO);
+		ft_putendl_fd("Minishell: Can't find cwd\n", STDOUT_FILENO);
 		return (EXIT_FAILURE);
 	}
 	ft_putendl_fd(current_working_diretory, STDOUT_FILENO);

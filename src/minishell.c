@@ -61,9 +61,12 @@ int	main(int argc, char **argv, char **envp)
 			ft_parser(&shell);
 			ft_expander(&shell);
 			ft_executor(&shell);
-			free(shell.prompt);
+			ft_clean_prompt(&shell);
 		}
 	}
-	ft_clean(&shell, 1);
-	return (0);
+	ft_clean_exit(&shell);
+	(void)(argc);
+	(void)(argv);
+	(void)(envp);
+	return (EXIT_SUCCESS);
 }

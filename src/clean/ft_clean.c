@@ -81,3 +81,19 @@ void	ft_clean(t_shell *shell, int error)
 		ft_putendl_fd("minishell: error getting prompt", STDOUT_FILENO);
 	exit (EXIT_FAILURE);
 }
+
+void	ft_clean_prompt(t_shell *shell)
+{
+	ft_clean_command(shell->command_list);
+	ft_clean_token(shell->token_list);
+	free(shell->prompt);
+}
+
+void	ft_clean_exit(t_shell *shell)
+{
+	ft_clean_command(shell->command_list);
+	ft_clean_char(shell->env);
+	ft_clean_token(shell->token_list);
+	free(shell->prompt);
+
+}

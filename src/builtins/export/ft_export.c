@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 #include "../../../includes/minishell.h"
 
+extern long long	g_status;
+
 int	ft_check_env_item(t_shell *shell, char *arg, int *i)
 {
 	int	position;
@@ -87,7 +89,7 @@ int	ft_export(t_shell *shell, t_cmd *tmp_cmd)
 	char	**new_env;
 
 	if (!tmp_cmd->sim_cmd[1])
-		ft_env(shell);
+		g_status = ft_env_with_declare(shell);
 	else
 	{
 		indexes[0] = ft_list_lenght(shell);
@@ -102,5 +104,5 @@ int	ft_export(t_shell *shell, t_cmd *tmp_cmd)
 		free(shell->env);
 		shell->env = new_env;
 	}
-	return (0);
+	return (g_status);
 }

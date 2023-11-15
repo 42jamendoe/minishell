@@ -65,6 +65,6 @@ void	ft_exit(t_shell *shell, t_cmd *tmp_cmd)
 		g_status = EXIT_FAILURE;
 	}
 	ft_putendl_fd("", STDERR_FILENO);
-	//ft_clean(shell, 1);
+	ft_clean_exit(shell);
 	exit(g_status);
 }

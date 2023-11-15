@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 #include "../includes/minishell.h"
 
+extern long long	g_status;
+
 char	**ft_get_paths(t_shell *shell)
 {
 	int		i;
@@ -131,6 +133,8 @@ void	ft_run_command(t_shell *shell, t_cmd *tmp_cmd)
 			exit (EXIT_SUCCESS);
 		}
 		waitpid(cmd, &status, 0);
+		if (!WTERMSIG(status))
+			g_status = status >> 8;
 	}
 }
 

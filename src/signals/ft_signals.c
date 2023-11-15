@@ -44,5 +44,3 @@ void	ft_config_signals(void)
 	sigaction(SIGINT, &sig_shell, NULL);
 	signal(SIGQUIT, SIG_IGN);
 }
-
-		//código da linha 21

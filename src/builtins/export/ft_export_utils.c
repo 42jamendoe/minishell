@@ -56,3 +56,27 @@ void	ft_add_new_vars(t_shell *shell, t_cmd *tmp_cmd, char **new_env)
 		z++;
 	}
 }
+
+int	ft_env_with_declare(t_shell *shell)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	while (shell->env[i])
+	{
+		j = 0;
+		ft_putstr_fd("declare -x ", STDOUT_FILENO);
+		while (shell->env[i][j] != '\0')
+		{
+			ft_putchar_fd(shell->env[i][j], STDOUT_FILENO);
+			if (shell->env[i][j] == '=')
+				ft_putchar_fd('\"', STDOUT_FILENO);
+			j++;
+		}
+		ft_putchar_fd('\"', STDOUT_FILENO);
+		ft_putendl_fd("", STDOUT_FILENO);	
+		i++;
+	}
+	return (EXIT_SUCCESS);
+}

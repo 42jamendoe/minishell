@@ -105,6 +105,7 @@ int				ft_check_env_item(t_shell *shell, char *arg, int *i);
 int				ft_position_of_equal(char *arg);
 int				ft_first_digit(char *arg);
 int				ft_validate_arg_export(char **env);
+int				ft_env_with_declare(t_shell *shell);
 int				ft_export(t_shell *shell, t_cmd *tmp_cmd);
 int				ft_list_lenght(t_shell *shell);
 int				ft_transf_vars(t_shell *shell, char **new_env, \
@@ -123,6 +124,9 @@ int				ft_check_list(t_shell *shell, char **env_unset);
 void			ft_clean_token(t_token *token_to_clean);
 void			ft_clean_char(char **char_to_clean);
 void			ft_clean_command(t_cmd *cmd_to_clean);
+//void			ft_clean_env(t_shell *shell);
+void			ft_clean_prompt(t_shell *shell);
+void			ft_clean_exit(t_shell *shell);
 void			ft_clean(t_shell *shell, int error);
 char			*get_sys_binpath(t_shell *shell, t_cmd *tmp_cmd);
 char			*ft_search_cmd(t_shell *shell, t_cmd *tmp_cmd);
