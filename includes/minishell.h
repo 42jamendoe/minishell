@@ -78,7 +78,6 @@ typedef struct s_cmd
 	int				in;
 	int				out;
 	int				prev_has_redirout;
-	int				next_has_redirin;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -99,7 +98,8 @@ int				ft_cd(t_shell *shell, t_cmd *tmp_cmd);
 int				ft_valid_option(t_cmd *tmp_cmd);
 int				ft_echo(t_cmd *tmp_cmd);
 int				ft_env(t_shell *shell);
-void			ft_get_exit_arg(t_cmd *tmp_cmd);
+void			ft_get_exit_arg(char *arg);
+int 			ft_check_exit_arg(char *arg);
 void			ft_exit(t_shell *shell, t_cmd *tmp_cmd);
 int				ft_check_env_item(t_shell *shell, char *arg, int *i);
 int				ft_position_of_equal(char *arg);

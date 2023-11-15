@@ -48,5 +48,5 @@ int	ft_echo(t_cmd *tmp_cmd)
 	}
 	if (n == 0)
 		ft_putchar_fd('\n', STDOUT_FILENO);
-	return (0);
+	return (EXIT_SUCCESS);
 }
