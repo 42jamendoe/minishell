@@ -18,6 +18,6 @@ int	ft_isvalidname(int c)
 /*
 ft_isvalidname checks for an alphanumeric character
 valid for environment VARIABLES NAMES;
-The values returned are nonzero if the character c falls into the
-tested class, and zero if not
+The values returned are 1 if the character c falls into the
+tested class, and 0 if not
 */

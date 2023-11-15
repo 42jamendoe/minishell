@@ -10,36 +10,41 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "../../../includes/minishell.h"
-long long status;
 
-void	ft_exit(t_shell *shell, char **arg)
+extern long long g_status;
+
+void	ft_get_exit_arg(t_cmd *tmp_cmd)
 {
-	int i;
-	int j;
-	
+	int	i;
+
 	i = 0;
-	j = 0;
-	(void)shell;
-	ft_putendl_fd("exit", STDOUT_FILENO);
-	while (arg[i])
+	while (tmp_cmd->sim_cmd[1][i])
+	{
+		if (!ft_isdigit(tmp_cmd->sim_cmd[1][i]))
+		{
+			if (tmp_cmd->sim_cmd[1][0] != '-' || tmp_cmd->sim_cmd[1][0] != '+')
+			{
+				ft_putstr_fd("exit:", STDOUT_FILENO);
+				ft_putstr_fd(tmp_cmd->sim_cmd[1], STDOUT_FILENO);
+				ft_putendl_fd(": numeric argument required", STDOUT_FILENO);
+				g_status = 2;
+			}
+		}
 		i++;
+	}
+}
+
+void	ft_exit(t_shell *shell, t_cmd *tmp_cmd)
+{
+	int	i;
+	int	status;
+
+	i = ft_list_lenght(shell);
+	ft_putendl_fd("exit", STDOUT_FILENO);
 	if (i == 2)
 	{
-		while (arg[1][j])
-		{
-			if (!ft_isdigit(arg[1][j]))
-			{
-				if (arg[1][0] != '-' || arg[1][0] != '+')
-				{
-					ft_putstr_fd("exit:", STDOUT_FILENO);
-					ft_putstr_fd(arg[1], STDOUT_FILENO);
-					ft_putendl_fd(": numeric argument required", STDOUT_FILENO);
-					status = 2;
-				}
-			}				
-			j++;
-		}
-		status = ft_atoll(arg[1]);
+		ft_get_exit_arg(tmp_cmd);
+		status = ft_atoll(tmp_cmd->sim_cmd[1]);
 	}
 	else if (i > 2)
 	{

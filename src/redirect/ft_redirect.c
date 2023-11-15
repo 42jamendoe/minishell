@@ -11,67 +11,91 @@
 /* ************************************************************************** */
 #include "../includes/minishell.h"
 
-void	ft_process_heredoc(char *end)
+int	ft_process_heredoc(t_cmd *current_command, int input, int i)
 {
 	char	*buffer;
-	int		fd_lines[2];
+	char	*end;
+	int		hd_fd[2];
 
-	pipe(fd_lines);
+	if (i > 0)
+		close(input);
+	pipe(hd_fd);
+	end = current_command->redir->token_str;
+	input = hd_fd[0];
 	while (1)
 	{
-		buffer = readline("> ");
+		buffer = readline("pipe heredoc> ");
 		if (!ft_strncmp(buffer, end, ft_strlen(end) + 1))
 			break ;
-		ft_putendl_fd(buffer, fd_lines[1]);
+		ft_putendl_fd(buffer, hd_fd[1]);
 	}
-	close(fd_lines[1]);
-	dup2(fd_lines[0], STDIN_FILENO);
-	close(fd_lines[0]);
-	free(buffer);
+	close(hd_fd[1]);
+	return (input);
 }
 
-void ft_check_redir_in(t_cmd *current_command, int i)
+int	ft_process_file(t_cmd *current_command, int input, int i)
 {
+	if (i > 0)
+		close(input);
+	if (access(current_command->redir->token_str, R_OK) < 0)
+	{
+		ft_putstr_fd(current_command->redir->token_str, STDERR_FILENO);
+		ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
+	}
+	else
+		input = open(current_command->redir->token_str, O_RDONLY);
+	return (input);
+}
+
+int	ft_check_redir_in(t_cmd *current_command)
+{
+	int	i;
+	int	input;
+
+	i = 0;
+	input = 0;
 	while (current_command->redir)
 	{
-		if(current_command->redir->name == LESS)
+		if (i > 0)
+			close(input);
+		if (current_command->redir->name == LESS || \
+		current_command->redir->name == LESSLESS)
 		{
-			//close(STDIN_FILENO);
-			if (access(current_command->redir->token_str, R_OK) < 0)
-			{
-				ft_putstr_fd(current_command->redir->token_str, STDERR_FILENO);
-				ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
-			}
-			else
-			{
-				i = open(current_command->redir->token_str, O_RDONLY);
-				if (dup2(i, STDIN_FILENO) < 0)
-					ft_putstr_fd("error with redirection file\n", STDERR_FILENO);
-				close(i);
-			}
+			if (current_command->redir->name == LESS)
+				input = ft_process_file(current_command, input, i);
+			else if (current_command->redir->name == LESSLESS)
+				input = ft_process_heredoc(current_command, input, i);
 		}
-		else if(current_command->redir->name == LESSLESS)
-			ft_process_heredoc(current_command->redir->token_str);
+		i++;
 		current_command->redir = current_command->redir->next;
 	}
+	return (input);
 }
 
-void ft_check_redir_out(t_cmd *current_command, int i)
+int	ft_check_redir_out(t_cmd *crt_cmd)
 {
-	while (current_command->redir)
+	int	i;
+	int	output;
+
+	output = 1;
+	i = 0;
+	if (!crt_cmd->redir)
+		return (1);
+	while (crt_cmd->redir)
 	{
-		if(current_command->redir->name == GREAT || current_command->redir->name == GREATGREAT)
+		if (i > 0)
+			close(output);
+		if (crt_cmd->redir->name == GREAT || crt_cmd->redir->name == GREATGREAT)
 		{
-			//close(STDOUT_FILENO);
-			if (current_command->redir->name == GREAT)
-				i = open(current_command->redir->token_str, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+			if (crt_cmd->redir->name == GREAT)
+				output = open(crt_cmd->redir->token_str, \
+				O_CREAT | O_WRONLY | O_TRUNC, 0644);
 			else
-				i = open(current_command->redir->token_str, O_CREAT | O_WRONLY | O_APPEND, 0644);
-			dup2(i, STDOUT_FILENO);
-			close(i);	
+				output = open(crt_cmd->redir->token_str, \
+				O_CREAT | O_WRONLY | O_APPEND, 0644);
 		}
-		current_command->redir = current_command->redir->next;
+		i++;
+		crt_cmd->redir = crt_cmd->redir->next;
 	}
+	return (output);
 }
-
-

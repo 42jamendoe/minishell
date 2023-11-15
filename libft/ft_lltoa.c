@@ -49,7 +49,6 @@ void	ft_write(char *c, int n, int dn)
 char	*ft_lltoa(long long n)
 {
 	char	*c;
-
 	int		dn;
 
 	dn = ft_digits(n);

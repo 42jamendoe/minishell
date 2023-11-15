@@ -9,7 +9,6 @@
 /*   Updated: 2023/08/08 20:20:50 by luaraujo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "../includes/minishell.h"
 
 void	ft_add_new(t_shell *shell, t_token *new_token)
@@ -33,8 +32,11 @@ t_token	*ft_create_item(char *token_char, t_token_name token_name)
 
 	new_token = (t_token *) malloc (sizeof(t_token));
 	if (!new_token)
-		ft_clean();
-	new_token->token_str = token_char;
+		return (NULL);
+	if (token_name != PIPE)
+		new_token->token_str = token_char;
+	else
+		new_token->token_str = NULL;
 	new_token->name = token_name;
 	new_token->next = NULL;
 	return (new_token);
@@ -66,10 +68,6 @@ int	ft_command_number(t_shell *shell)
 			i++;
 		tmp_token = tmp_token->next;
 	}
+	i++;
 	return (i);
-}
-
-void	ft_clean(void)
-{
-	exit(EXIT_FAILURE);
 }

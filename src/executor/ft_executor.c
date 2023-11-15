@@ -21,11 +21,10 @@ char	**ft_get_paths(t_shell *shell)
 	splited = NULL;
 	while (shell->env[i])
 	{
-		
 		if (shell->env[i] && ft_strncmp(shell->env[i], "PATH=", 5))
 			i++;
 		else
-		{	
+		{
 			paths_char = ft_substr(shell->env[i], 5, \
 			ft_strlen(shell->env[i]) - 5);
 			splited = ft_split(paths_char, ':');
@@ -35,167 +34,116 @@ char	**ft_get_paths(t_shell *shell)
 	return (NULL);
 }
 
-void	ft_run_cmd_lib(t_shell *shell)
+void	ft_handle_left_side(int cmd_nbr, t_cmd *tmp_cmd, \
+int tmp_pipe[2], int backup[2])
 {
-	t_cmd	*tmp;
-	char	*new;
-	char	**path;
-	int		i;
-
-	path = ft_get_paths(shell);
-	tmp = shell->command_list;
-	while (tmp)
+	if (tmp_cmd->in)
 	{
-		i = 0;
-		while (path[i])
+		tmp_pipe[0] = ft_check_redir_in(tmp_cmd);
+		dup2(tmp_pipe[0], STDIN_FILENO);
+		close(tmp_pipe[0]);
+	}
+	else
+	{
+		if (!tmp_cmd->order_id || !tmp_cmd->prev_has_redirout)
 		{
-			if (access(ft_strjoin(ft_strjoin(path[i], "/"), \
-			tmp->sim_cmd[0]), F_OK) != 0)
-				i++;
+			if (!tmp_cmd->order_id )
+				tmp_pipe[0] = STDIN_FILENO;
 			else
-				break ;
+			{
+				dup2(tmp_pipe[0] , STDIN_FILENO);
+				close(tmp_pipe[0]);
+				pipe(tmp_pipe);
+				close(tmp_pipe[1]);
+			}
 		}
-		new = ft_strjoin(ft_strjoin(path[i], "/"), tmp->sim_cmd[0]);
-		free(tmp->sim_cmd[0]);
-		tmp->sim_cmd[0] = new;
-		tmp = tmp->next;
+		else if (tmp_cmd->prev_has_redirout)
+		{
+			dup2(backup[0], tmp_pipe[0]);
+			dup2(tmp_pipe[0], STDIN_FILENO);
+			close(tmp_pipe[0]);
+		}
+	}
+	if (tmp_cmd->order_id == cmd_nbr - 1)
+	{
+		tmp_pipe[1] = STDOUT_FILENO;		
+		if (tmp_cmd->out)
+			tmp_pipe[1] = ft_check_redir_out(tmp_cmd);
+		else
+			dup2(backup[1], tmp_pipe[1]);
+		dup2(tmp_pipe[1], STDOUT_FILENO);
 	}
 }
 
-void ft_run_single_command(t_shell *shell)
+void	ft_handle_right_side(t_cmd *tmp_cmd, int tmp_pipe[2])
+{
+	//int	next_input[2];
+
+	if (tmp_cmd->next->in)
+		tmp_pipe[1] = tmp_pipe[1];
+	else
+	{
+		if (tmp_cmd->out)
+			tmp_pipe[1] = ft_check_redir_out(tmp_cmd);
+		else
+			pipe(tmp_pipe);
+	}
+	dup2(tmp_pipe[1], STDOUT_FILENO);
+	close(tmp_pipe[1]);
+}
+
+void	ft_run_command(t_shell *shell, t_cmd *tmp_cmd)
 {
 	pid_t	cmd;
+	int		status;
 
-	if (shell->command_list->function_name < 0)
+	status = 0;
+	if (shell->command_list->function_name > 0 && \
+	!shell->command_list->redir && shell->cmd_nbr == 1)
+	{
+		ft_run_builtin(shell, tmp_cmd);
+		close(STDIN_FILENO);
+		close(STDOUT_FILENO);
+	}
+	else
 	{
 		cmd = fork();
+		if (cmd < 0)
+			ft_clean(shell, 1);
 		if (cmd == 0)
 		{
-			execve(shell->command_list->sim_cmd[0], \
-			shell->command_list->sim_cmd, shell->env);
-			return ;
+			ft_execute_cmd(shell, tmp_cmd);
+			close(STDIN_FILENO);
+			close(STDOUT_FILENO);
+			exit (EXIT_SUCCESS);
 		}
-		waitpid(cmd, NULL, 0);
+		waitpid(cmd, &status, 0);
 	}
-	else
-		ft_run_builtin(shell, shell->command_list->function_name);
-}
-
-void	ft_deal_first_command(t_cmd *tmp_cmd, int first)
-{
-	if (tmp_cmd->in)
-		ft_check_redir_in(tmp_cmd, STDIN_FILENO);
-	if (tmp_cmd->out)
-		ft_check_redir_out(tmp_cmd, first);
-	else if (tmp_cmd->next->in)
-		close(first);
-	else
-	{
-		if (dup2(first, STDOUT_FILENO) < 0)
-			ft_clean();
-		close(first);
-	}
-}
-
-void	ft_deal_middle_command(t_cmd *tmp_cmd, int left, int right)
-{
-	if (tmp_cmd->in)
-		ft_check_redir_in(tmp_cmd, left);		
-	else if (tmp_cmd->prev_has_redirout || tmp_cmd->order_id == 0)
-		close(left);
-	else
-	{
-		if (dup2(left, STDIN_FILENO) < 0)
-			ft_clean();
-		close(left);
-	}
-	if (tmp_cmd->out)
-		ft_check_redir_out(tmp_cmd, right);
-	else if (tmp_cmd->next->out || tmp_cmd->order_id == tmp_cmd->arg_nbr - 1)
-		close(right);
-	else
-	{
-		if (dup2(right, STDOUT_FILENO) < 0)
-			ft_clean();
-		close(right);
-	}
-}
-
-void	ft_exec(t_shell *shell, t_cmd *tmp_cmd, int left, int right)
-{
-	if (execve(tmp_cmd->sim_cmd[0], tmp_cmd->sim_cmd, shell->env) < 0)
-	{
-		perror (0);
-		exit(127);
-	}
-		close(left);
-		close(right);
-}
-
-void	ft_close_main(t_shell *shell, int pipe_fds[][2])
-{
-	int	i;
-
-	i = 0;
-	while (i < shell->cmd_nbr + 1)
-	{
-		close(pipe_fds[i][0]);
-		close(pipe_fds[i][1]);
-		i++;
-	}
-	i = 0;
-	// while(i < shell->cmd_nbr)
-	// {
-		
-	// 	waitpid(cmd[i], &status, 0);
-	// 	i++;
-	// }
-}
-
-int ft_fork(t_shell *shell, t_cmd *tmp_cmd, int pipe_fds[][2])
-{
-	pid_t	cmd[shell->cmd_nbr];
-			
-	cmd[tmp_cmd->order_id] = fork();
-	if (cmd[tmp_cmd->order_id] < 0)
-		ft_clean();
-	if (cmd[tmp_cmd->order_id] == 0)
-	{			
-		ft_close_pipes(shell, tmp_cmd, pipe_fds);
-		if (tmp_cmd->order_id < shell->cmd_nbr)
-			ft_deal_middle_command(tmp_cmd, pipe_fds[tmp_cmd->order_id][0], pipe_fds[tmp_cmd->order_id + 1][1]);
-		else
-			ft_deal_middle_command(tmp_cmd, pipe_fds[tmp_cmd->order_id][0], pipe_fds[tmp_cmd->order_id + 1][1]);
-		ft_exec(shell, tmp_cmd, pipe_fds[tmp_cmd->order_id][0], pipe_fds[tmp_cmd->order_id + 1][1]);
-		exit(EXIT_SUCCESS);
-	}
-	
-	ft_close_main(shell, pipe_fds);
-	waitpid(-1, NULL, 0);
-	return (0);
 }
 
 void	ft_executor(t_shell *shell)
 {
 	t_cmd	*tmp_cmd;
-	int 	pipe_fds[3][2];
+	int		backup[2];
+	int		tmp_pipe[2];
 
-	
 	tmp_cmd = shell->command_list;
-	ft_run_cmd_lib(shell);
-	if (shell->cmd_nbr == 1)
-		ft_run_single_command(shell);
-	else
+	backup[0] = dup(STDIN_FILENO);
+	backup[1] = dup(STDOUT_FILENO);
+	while (tmp_cmd)
 	{
-		ft_create_pipes(shell, pipe_fds);
-		while (tmp_cmd)
-		{
-			ft_fork(shell, tmp_cmd, pipe_fds);
-
-			if (!tmp_cmd->next)
-				break;
-			tmp_cmd = tmp_cmd->next;
-		}
+		ft_handle_left_side(shell->cmd_nbr, tmp_cmd, tmp_pipe, backup);
+		if (tmp_cmd->order_id != shell->cmd_nbr - 1)
+			ft_handle_right_side(tmp_cmd, tmp_pipe);
+		ft_run_command(shell, tmp_cmd);
+		close(STDIN_FILENO);
+		close(STDOUT_FILENO);
+		dup2(backup[0], STDIN_FILENO);
+		dup2(backup[1], STDOUT_FILENO);
+		if (!tmp_cmd->next)
+			break ;
+		tmp_cmd = tmp_cmd->next;
 	}
+	close(backup[0]);
+	close(backup[1]);
 }
-		

@@ -10,23 +10,24 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "../includes/minishell.h"
-long long g_status;
+
+extern long long	g_status;
 
 void	ft_handle_sigint(int sig)
 {
 	if (sig == SIGINT)
 	{
 		ft_putchar_fd('\n', STDOUT_FILENO);
-		// rl_on_new_line();
-		// rl_replace_line("", 0);
-		// rl_redisplay();
+		rl_on_new_line();
+		rl_replace_line("", 0);
+		rl_redisplay();
 		g_status = 130;
 	}
 }
 
 void	ft_config_signals(void)
 {
-	struct sigaction sig_shell;
+	struct sigaction	sig_shell;
 
 	if (sigemptyset(&sig_shell.sa_mask))
 	{
@@ -39,6 +40,9 @@ void	ft_config_signals(void)
 		exit(EXIT_FAILURE);
 	}
 	sig_shell.sa_handler = &ft_handle_sigint;
+	sig_shell.sa_flags = SA_RESTART;
 	sigaction(SIGINT, &sig_shell, NULL);
 	signal(SIGQUIT, SIG_IGN);
 }
+
+		//código da linha 21

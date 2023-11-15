@@ -9,12 +9,11 @@
 /*   Updated: 2023/08/08 20:20:50 by luaraujo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "../../../includes/minishell.h"
 
-void ft_change_env_path(t_shell *shell, char *newd, char *path)
+void	ft_change_env_path(t_shell *shell, char *newd, char *path)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (shell->env[i])
@@ -32,38 +31,40 @@ void ft_change_env_path(t_shell *shell, char *newd, char *path)
 	}
 }
 
-int	ft_cd(t_shell *shell, char **newd)
-{	
-	char		path[PATH_MAX];
-	char		*directory;
-	
-	getcwd(path, PATH_MAX);
-	directory = NULL;
- 	if (!newd[1] || !ft_strncmp(newd[1], "~", 2))
-		directory = getenv("HOME");
-	else if (!ft_strncmp(newd[1], "-", 2))
-		directory = getenv("OLDPWD");
-	if (directory)
+void	ft_print_error_cd(char *directory)
+{
+	if (chdir(directory))
 	{
-		if (chdir(directory))
-		{
-			ft_putstr_fd(directory, STDERR_FILENO);
-			ft_putstr_fd(": not defined", STDERR_FILENO);
-			return (EXIT_FAILURE);
-		}
+		ft_putstr_fd(directory, STDERR_FILENO);
+		ft_putstr_fd(": not defined", STDERR_FILENO);
 	}
-	else
-		directory = newd[1];
 	if (chdir(directory))
 	{
 		ft_putstr_fd(directory, STDERR_FILENO);
 		ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
+	}
+}
+
+int	ft_cd(t_shell *shell, t_cmd *tmp_cmd)
+{
+	char		path[PATH_MAX];
+	char		*directory;
+
+	getcwd(path, PATH_MAX);
+	directory = NULL;
+	if (!tmp_cmd->sim_cmd[1] || !ft_strncmp(tmp_cmd->sim_cmd[1], "~", 2))
+		directory = getenv("HOME");
+	else if (!ft_strncmp(tmp_cmd->sim_cmd[1], "-", 2))
+		directory = getenv("OLDPWD");
+	if (directory || chdir(directory))
+	{
+		ft_print_error_cd(directory);
 		return (EXIT_FAILURE);
 	}
-	else
-		ft_change_env_path(shell, directory, path);
+	directory = tmp_cmd->sim_cmd[1];
+	ft_change_env_path(shell, directory, path);
 	return (EXIT_SUCCESS);
 }
 
-
-/* if cd or cd ~ the diretory must change to HOME and if cd - the diretory must change to OLDPWD*/
+/* if cd or cd ~ the diretory must change to HOME and if cd - 
+the diretory must change to OLDPWD*/

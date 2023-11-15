@@ -26,10 +26,7 @@ void	ft_build_redirection_list(t_shell *shell, t_cmd *command)
 		anchor->next = shell->token_list;
 	}
 	index = shell->token_list;
-	free(index->token_str);
-	index->token_str = index->next->token_str;
-	shell->token_list = index->next->next;
-	free(index->next);
+	shell->token_list = index->next;
 	index->next = NULL;
 }
 
@@ -92,7 +89,7 @@ void	ft_add_command(t_shell *shell, t_cmd *command)
 void	ft_parser(t_shell *shell)
 {
 	t_cmd	*tmp_cmd;
-	int i;
+	int		i;
 
 	i = 0;
 	shell->command_list = NULL;
@@ -107,12 +104,13 @@ void	ft_parser(t_shell *shell)
 		tmp_cmd->next = NULL;
 		ft_create_command(shell, tmp_cmd);
 		ft_check_redir(tmp_cmd);
+		tmp_cmd->function_name = ft_check_function(tmp_cmd->sim_cmd[0]);
 		ft_add_command(shell, tmp_cmd);
 		i++;
 	}
 }
 
-void ft_print_elements_char(t_shell *shell)
+/* void ft_print_elements_char(t_shell *shell)
 {
 	t_token	*command = shell->command_list->redir;
 	int i = 1;
@@ -143,8 +141,10 @@ void ft_print_elements_redir(t_shell *shell)
 		}
 		else
 		{
-			printf("%d. token redir: *%s* e name: *%d*\n", i, listaredir->redir->token_str, listaredir->redir->name);
+			printf("%d. token redir: *%s* e name: *%d*\n", i, \
+			listaredir->redir->token_str, listaredir->redir->name);
 		}
 		listaredir = listaredir->next;
 	}
 }
+ */

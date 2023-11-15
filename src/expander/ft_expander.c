@@ -11,79 +11,100 @@
 /* ************************************************************************** */
 #include "../includes/minishell.h"
 
-//long long	g_status;
-
-char	*ft_expand_text(char *arg, int anchor, int position)
-{
-	char	*tmp_text;
-	int		len;
-
-	len = position - anchor;
-	tmp_text = ft_substr(arg, anchor, len);
-	return (tmp_text);
-}
-
-char	*ft_expand_var(char *arg, int anchor, int position)
-{
-	char	*expanded;
-
-	// if (arg[anchor + 1] == '\?')
-	// {
-	// 	expanded = ft_lltoa(g_status);
-	// 	if (!expanded)
-	// 		ft_clean();
-	// 	return (expanded);
-	// }
-	anchor += 1;
-	expanded = ft_expand_dollar(arg, anchor, position);
-	if (!expanded)
-		ft_clean();
-	return (expanded);
-}
-
-char	*ft_process_arg(char *arg, int anchor, int position)
-{
-	char	*substr_expanded;
-
-	if (arg[anchor] != '$')
-		substr_expanded = ft_expand_text(arg, anchor, position);
-	else
-		substr_expanded = ft_expand_var(arg, anchor, position);
-	return (substr_expanded);
-}
-
-char	*ft_expand_arg(char *arg, int *position)
+char	*ft_expand_arg(t_shell *shell, char *arg, int *position, int *dq)
 {
 	t_state		arg_state;
 	char		*expanded;
-	char		*tmp_trimmed;
-	int			anchor;
 
-	arg_state = ft_define_state(arg[(*position)]);
+	expanded = NULL;
+	arg_state = ft_define_state(arg[(*position)], &(*dq));
 	if (arg_state == DEFAULT)
 	{
-		anchor = (*position);
-		while (arg[(*position)] != '\0' && arg[(*position)] != '\'' \
-		&& arg[(*position)] != '\"')
-			(*position)++;
-		expanded = ft_process_arg(arg, anchor, (*position));
-		if (arg[(*position)])
-			(*position)++;
+		expanded = ft_state_is_default(shell, arg, &(*position));
 	}
 	else if (arg_state == SQUOTE)
-		expanded = ft_strtrim(arg, "\'");
-	else if (arg_state == DQUOTE)
 	{
-		tmp_trimmed = ft_strtrim(arg, "\"");
-		while (arg[(*position)] != '\0' && arg[(*position)] != '\'' \
-		&& arg[(*position)] != '\"')
-			(*position)++;
-		expanded = ft_process_arg(tmp_trimmed, 0, (*position));
-		free(tmp_trimmed);
+		expanded = ft_state_is_squote(arg, &(*position));
 	}
-	else
-		expanded = NULL;
+	else if (arg_state == DQUOTE || arg_state == DQUOTEOPEN)
+	{
+		expanded = ft_state_is_dquote(shell, arg, &(*position), arg_state);
+	}
+	if (!expanded)
+		return (NULL);
 	return (expanded);
+}
+
+char	*ft_exp_command(t_shell *shell, t_cmd *tmp_cmd, int nbr, int position)
+{
+	char	*expanded;
+	char	*tmp_word;
+	char	*join;
+	int		dq;
+
+	dq = 0;
+	expanded = ft_strdup("\0");
+	if (!expanded)
+		return (NULL);
+	while (tmp_cmd->sim_cmd[nbr][position] != '\0')
+	{
+		tmp_word = ft_expand_arg(shell, tmp_cmd->sim_cmd[nbr], &position, &dq);
+		if (expanded[0] == '\0')
+			join = tmp_word;
+		else
+		{
+			join = ft_strjoin(expanded, tmp_word);
+			free(tmp_word);
+		}
+		if (!join)
+			return (NULL);
+		free(expanded);
+		expanded = join;
+	}
+	return (expanded);
+}
+
+char	*ft_join_string(t_shell *shell, t_token *tmp_redir, \
+char *expanded, int *dq)
+{
+	char	*tmp_word;
+	char	*join;
+	int		position;
+
+	position = 0;
+	while (tmp_redir->token_str[position] != '\0')
+	{
+		tmp_word = ft_expand_arg(shell, tmp_redir->token_str, \
+		&position, &(*dq));
+		join = ft_strjoin(expanded, tmp_word);
+		if (!join)
+			return (NULL);
+		free(expanded);
+		free(tmp_word);
+		expanded = join;
+	}
+	return (expanded);
+}
+
+int	ft_exp_redir(t_shell *shell, t_cmd *tmp_cmd)
+{
+	t_token	*tmp_redir;
+	char	*expanded;
+	int		dq;
+
+	tmp_redir = tmp_cmd->redir;
+	while (tmp_redir)
+	{
+		dq = 0;
+		expanded = ft_strdup("\0");
+		if (!expanded)
+			return (-1);
+		expanded = ft_join_string(shell, tmp_redir, expanded, &dq);
+		free(tmp_redir->token_str);
+		tmp_redir->token_str = expanded;
+		tmp_redir = tmp_redir->next;
+	}
+	return (0);
 }
 
 void	ft_expander(t_shell *shell)
@@ -91,49 +112,21 @@ void	ft_expander(t_shell *shell)
 	t_cmd	*tmp_command;
 	char	*tmp_word;
 	int		arg_count;
-	int 	position;
-	char	*tmp1;
-	char	*tmp2;
-	tmp_command = shell->command_list;
+	int		position;
 
+	tmp_command = shell->command_list;
 	while (tmp_command)
 	{
 		arg_count = 1;
 		while (tmp_command->sim_cmd[arg_count])
 		{
 			position = 0;
-			tmp1 = ft_strdup("\0");
-			while (tmp_command->sim_cmd[arg_count][position] != '\0')
-			{
-				tmp_word = ft_expand_arg(tmp_command->sim_cmd[arg_count], &position);
-				tmp2 = ft_strjoin(tmp1, tmp_word);
-				free(tmp1);
-				if (arg_count < tmp_command->arg_nbr - 2)
-					free(tmp_word);
-				if (!tmp2)
-					ft_clean();
-				tmp1 = tmp2;
-			}
-			tmp_command->sim_cmd[arg_count] = tmp1;
+			tmp_word = ft_exp_command(shell, tmp_command, arg_count, position);
+			tmp_command->sim_cmd[arg_count] = tmp_word;
 			arg_count++;
 		}
+		if (tmp_command->redir)
+			ft_exp_redir(shell, tmp_command);
 		tmp_command = tmp_command->next;
 	}
 }
-
-/*  	int i = 0;
-	t_cmd *apagar = shell->command_list;
-	if (!shell->command_list)
-	{
-		// printf("sem comando\n");
-	}
-	else
-	{
-	while (apagar)
-	{
-		while (shell->command_list->sim_cmd[i])
-			i++;
-		// printf("%s\n", shell->command_list->sim_cmd[i]);
-		apagar = apagar->next;
-	}
-	} */

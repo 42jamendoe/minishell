@@ -1,7 +1,7 @@
 NAME = minishell
 LIBFT = ./libft/libft.a
-CC = cc
-CFLAGS = -Wall -Wextra -Werror -g#-fsanitize=address
+CC = gcc
+CFLAGS = -Wall -Wextra -Werror -g #-fsanitize=address
 RM = rm -rf
 
 SRCD = ./src
@@ -14,8 +14,10 @@ SRC = minishell.c \
 		parser/ft_parser_utils.c \
 		expander/ft_expander.c \
 		expander/ft_expander_utils.c \
+		expander/ft_expander_utils2.c \
 		executor/ft_executor.c \
 		executor/ft_executor_utils.c \
+		signals/ft_signals.c \
 		redirect/ft_redirect.c \
 		builtins/cd/ft_cd.c \
 		builtins/pwd/ft_pwd.c \
@@ -23,15 +25,19 @@ SRC = minishell.c \
 		builtins/env/ft_env.c \
 		builtins/exit/ft_exit.c \
 		builtins/export/ft_export.c \
+		builtins/export/ft_export_utils.c \
 		builtins/unset/ft_unset.c \
+		builtins/unset/ft_unset_utils.c \
 		cmd/ft_cmd.c \
+		clean/ft_clean.c \
+		tests/ft_tests.c \
 
 OBJ = $(SRC:%.c=$(SRCD)/%.o)
 
 all: $(LIBFT) $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -Llibft -lft -lreadline -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJ) -Llibft -lft -lreadline  -o $(NAME)
 
 $(LIBFT):	
 	$(MAKE) -C libft

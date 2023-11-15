@@ -11,6 +11,16 @@
 /* ************************************************************************** */
 #include "../includes/minishell.h"
 
+void	ft_prepare_env(t_shell *shell, char **envp)
+{
+	shell->env = NULL;
+	if (ft_create_env(shell, envp))
+	{
+		ft_putendl_fd("minishell: Can't create environment", STDOUT_FILENO);
+		exit (EXIT_FAILURE);
+	}
+}
+
 int	ft_create_env(t_shell *shell, char **env)
 {
 	char	**new_env;
@@ -19,17 +29,18 @@ int	ft_create_env(t_shell *shell, char **env)
 	i = 0;
 	while (env[i])
 		i++;
-	new_env = (char **) malloc (sizeof(char *) * i);
+	new_env = (char **) malloc (sizeof(char *) * (i + 1));
 	if (!new_env)
-		ft_clean();
+		return (-1);
 	i = 0;
 	while (env[i])
 	{
 		new_env[i] = ft_strdup(env[i]);
 		if (!(new_env[i]))
-			ft_clean();
+			return (-1);
 		i++;
 	}
+	new_env[i] = NULL;
 	shell->env = new_env;
 	return (0);
 }

@@ -17,10 +17,10 @@ char	*ft_strdup(const char *s)
 	size_t	i;
 	size_t	j;
 
-	i = 0;
-	while (s[i])
-		i++;
-	sc = (char *)malloc(sizeof(*s) * i + 1);
+	if (!s)
+		return (NULL);
+	i = ft_strlen(s);
+	sc = (char *)malloc(sizeof(char) * i + 1);
 	if (!sc)
 		return (NULL);
 	j = 0;

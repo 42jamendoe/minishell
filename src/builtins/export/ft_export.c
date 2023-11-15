@@ -9,26 +9,24 @@
 /*   Updated: 2023/08/08 20:20:50 by luaraujo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "../../../includes/minishell.h"
 
-int ft_check_env_item(t_shell *shell, char *arg)
+int	ft_check_env_item(t_shell *shell, char *arg, int *i)
 {
-	int position;
-	int i;
+	int	position;
 
 	position = ft_position_of_equal(arg);
-	i = 0;
-	while (shell->env[i])
+	(*i) = 1;
+	while (shell->env[(*i)])
 	{
-		if (!ft_strncmp(shell->env[i], arg, position))
-			return (i);
-		i++;
+		if (!ft_strncmp(shell->env[(*i)], arg, position))
+			return (*i);
+		(*i)++;
 	}
 	return (-1);
 }
 
-int ft_position_of_equal(char *arg)
+int	ft_position_of_equal(char *arg)
 {
 	int	i;
 
@@ -44,9 +42,9 @@ int ft_position_of_equal(char *arg)
 
 int	ft_first_digit(char *arg)
 {
-	int i;
-	int position;
-	int status;
+	int		i;
+	int		position;
+	int		status;
 
 	i = 0;
 	status = 0;
@@ -55,7 +53,7 @@ int	ft_first_digit(char *arg)
 		status = 1;
 	while (i < position && status == 0)
 	{
-		if (!ft_isvalidname(arg[i]))
+		if (ft_isvalidname(arg[i]) < 0)
 			status = 1;
 		i++;
 	}
@@ -63,66 +61,46 @@ int	ft_first_digit(char *arg)
 	{
 		ft_putstr_fd(arg, STDERR_FILENO);
 		ft_putendl_fd(": not a valid identifier", STDERR_FILENO);
-		arg[0] = '\0'; 
-		return (0);		
+		arg[0] = '\0';
+		return (0);
 	}
 	return (1);
 }
 
-
-int ft_validate_arg(char **env)
+int	ft_validate_arg_export(char **env)
 {
-	int valid;
-	int i;
+	int	i;
 
-	valid = 0;
-	i = 0;
+	i = 1;
 	while (env[i])
 	{
-		valid += ft_first_digit(env[i]);
+		if (ft_first_digit(env[i]) == 0)
+			return (EXIT_FAILURE);
 		i++;
 	}
-	return (valid);
+	return (i - 1);
 }
 
-
-int	ft_export(t_shell *shell, char **env)
+int	ft_export(t_shell *shell, t_cmd *tmp_cmd)
 {
-	int i;
-	int valid;
-	char **new_env;
-	int z;
-	int position;
+	int		indexes[4];
+	char	**new_env;
 
-	i = 0;
-	z = 0;
-	if (!env[1])
+	if (!tmp_cmd->sim_cmd[1])
 		ft_env(shell);
 	else
 	{
-		while (shell->env[z])
-			z++;
-		valid = ft_validate_arg(env);
-		new_env = (char **) malloc (sizeof(char *) * (z + valid));
+		indexes[0] = ft_list_lenght(shell);
+		indexes[1] = ft_validate_arg_export(tmp_cmd->sim_cmd);
+		indexes[2] = 0;
+		indexes[3] = 0;
+		new_env = (char **) malloc (sizeof(char *) * (indexes[0] + indexes[1]));
 		if (!new_env)
-			ft_clean();
-		while (shell->env[i])
-		{
-			new_env[i] = shell->env[i];
-			i++;
-		}
-		z = 0;
-		while (env[z])
-		{
-			if (env[z][0] != '\0')
-				i--;
-			position = ft_check_env_item(shell, env[z]);
-			if (position < 0)
-				new_env[i + z] = env[z];
-			else
-				new_env[i] = env[z];
-			z++;
-		}
+			ft_clean(shell, 1);
+		indexes[2] = ft_transf_vars(shell, new_env, indexes[1], indexes[0]);
+		ft_add_new_vars(shell, tmp_cmd, new_env);
+		free(shell->env);
+		shell->env = new_env;
 	}
 	return (0);
 }

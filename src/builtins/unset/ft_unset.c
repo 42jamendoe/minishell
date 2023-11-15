@@ -9,74 +9,21 @@
 /*   Updated: 2023/08/08 20:20:50 by luaraujo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "../../../includes/minishell.h"
 
-int ft_str_is_env(char *env_itens, char *env_to_test)
+char	**ft_build_new_env(t_shell *shell, char **env, int j)
 {
-	size_t len;
+	int		k;
+	char	**new_env;
 
-	len = ft_strlen(env_to_test);
-	
-	if (!ft_strncmp(env_itens, env_to_test, len) && env_itens[len + 1] == '=' && \
-	env_to_test[len + 1] == '\0')
-		return(1);
-	return (0);
-
-}
-
-
-/* char **ft_copy_remain(t_shell *shell, char **env)
-{
-	int i;
-	int j;
-	char **new_env;
-
-	i = 0;
-	j = 0;
-	while (shell->env[i])
-	{
-		while (env[j])
-		{
-			if (!ft_str_is_env(shell->env[i], env[j]))
-				new_env[i] = shell->env[i];
-			else
-				free(shell->env[i]);
-			j++;
-		}
-		i++;
-	}
-	return (new_env);
-}*/
-
-char **ft_build_new_env(t_shell *shell, char **env, int j)
-{
-	int i;
-	char **new_env;
-
-	i = 0;
-	while (shell->env[i])
-		i++;
-	new_env = (char **) malloc (sizeof(char *) * (i - j));
-	i = 0;
-	while (shell->env[i])
-	{
-		j = 0;
-		while (env[j])
-		{
-			if (!ft_str_is_env(shell->env[i], env[j]))
-			{
-				new_env[i] = shell->env[i + j];
-				j++;
-			}
-			else
-				free(shell->env[i + j]);
-		}
-		i++;
-	}
+	k = ft_list_lenght(shell);
+	new_env = (char **) malloc (sizeof(char *) * (k - j));
+	if (!new_env)
+		ft_clean(shell, 1);
+	new_env[k - j] = NULL;
+	ft_loop_list(shell->env, env, new_env);
 	return (new_env);
 }
-
 
 int	ft_arg_validate_unset(char **env)
 {
@@ -85,45 +32,79 @@ int	ft_arg_validate_unset(char **env)
 
 	i = 1;
 	j = 0;
-	if (!env[i])
-		return (EXIT_SUCCESS);
 	while (env[i])
 	{
 		while (env[i][j] != '\0')
 		{
-			if (!ft_isvalidname(env[i][j]))
+			if (ft_isvalidname(env[i][j]) != 1)
 			{
 				ft_putstr_fd(env[i], STDERR_FILENO);
-				ft_putstr_fd(": not a valid identifier", STDERR_FILENO);
-				return (EXIT_FAILURE);
+				ft_putendl_fd(": not a valid identifier", STDERR_FILENO);
+				return (i);
 			}
 			j++;
 		}
 		i++;
 	}
-	return (0);
+	return (i);
 }
 
-int	ft_unset(t_shell *shell, char **env)
+int	ft_validate_name(char *arg)
 {
-	char **new_env;
-	int i;
-	int j;
+	int		i;
+	int		status;
+
+	i = 0;
+	status = 0;
+	if (ft_isdigit(arg[0]) || ft_strlen(arg) < 1)
+		status = 1;
+	while (i < (int)ft_strlen(arg) && status == 0)
+	{
+		if (ft_isvalidname(arg[i]) < 0)
+			status = 1;
+		i++;
+	}
+	if (status == 1)
+	{
+		ft_putstr_fd(arg, STDERR_FILENO);
+		ft_putendl_fd(": not a valid identifier", STDERR_FILENO);
+		arg[0] = '\0';
+		return (0);
+	}
+	return (1);
+}
+
+int	ft_validate_arg_unset(char **env)
+{
+	int	i;
 
 	i = 1;
-	j = 0;
-	if (ft_arg_validate_unset(env))
-		return (EXIT_FAILURE);
+	while (env[i])
+	{
+		if (ft_validate_name(env[i]) == 0)
+			return (EXIT_FAILURE);
+		i++;
+	}
+	return (i - 1);
+}
+
+int	ft_unset(t_shell *shell, t_cmd *tmp_cmd)
+{
+	char	**new_env;
+	int		list_len;
+	int		valid_arg;
+
+	if (!tmp_cmd->sim_cmd[1])
+		return (EXIT_SUCCESS);
 	else
 	{
-		while (env[i])
-		{
-			if (!getenv(env[i]))
-				j++;
-		}
-		new_env = ft_build_new_env(shell, env, j);
-		free(shell->command_list);
+		list_len = ft_list_lenght(shell);
+		if (!ft_validate_arg_unset(tmp_cmd->sim_cmd) || !list_len)
+			return (EXIT_FAILURE);
+		valid_arg = ft_check_list(shell, tmp_cmd->sim_cmd);
+		new_env = ft_build_new_env(shell, tmp_cmd->sim_cmd, valid_arg);
+		free(shell->env);
 		shell->env = new_env;
+		return (0);
 	}
-	return (0);
 }

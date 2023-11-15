@@ -66,9 +66,9 @@ MANDATORYO = $(MANDATORY:.c=.o)
 
 BONUSO = $(BONUS:.c=.o)
 
-CC = cc
+CC = gcc
 
-FLAGS = -Wall -Wextra -Werror -std=c99
+FLAGS = -Wall -Wextra -Werror -std=c99 -g
 
 REMOVE = rm -rf
 
