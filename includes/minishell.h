@@ -185,5 +185,11 @@ int				ft_check_redir_in(t_cmd *current_command);
 int				ft_check_redir_out(t_cmd *crt_cmd);
 void			ft_handle_sigint(int sig);
 void			ft_config_signals(void);
+int	ft_check_token_valid(t_shell *shell);
+int	ft_check_token_end(t_shell *shell);
+void	ft_check_token_end_last(t_shell *shell, int i);
+int	ft_check_double_pipe(t_shell *shell);
+void	ft_check_double_quotes(t_shell *shell);
 
+void ft_erase_double_quotes(t_shell *shell, int i, int j);
 #endif

@@ -97,3 +97,5 @@ void	ft_clean_exit(t_shell *shell)
 	free(shell->prompt);
 
 }
+
+// void	ft_reset_

@@ -50,11 +50,12 @@ int	main(int argc, char **argv, char **envp)
 	{
 		ft_config_signals();
 		prompt_tmp = readline("minishell$");
+		if (!prompt_tmp)
+			exit(EXIT_SUCCESS);
 		shell.prompt = ft_strdup(prompt_tmp);
-		if (!shell.prompt)
-			ft_clean(&shell, 1);
 		free(prompt_tmp);
-		if (!ft_check_prompt(shell.prompt))
+		ft_check_double_quotes(&shell);
+		if (!ft_check_prompt(shell.prompt) && !ft_check_token_end(&shell) && shell.prompt)
 		{
 			add_history(shell.prompt);
 			ft_lexer(&shell);

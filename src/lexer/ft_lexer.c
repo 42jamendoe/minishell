@@ -94,4 +94,5 @@ void	ft_lexer(t_shell *shell)
 		i += ft_create_word(shell, i, token_tmp);
 	}
 	shell->cmd_nbr = ft_command_number(shell);
+	ft_check_token_valid(shell);
 }
