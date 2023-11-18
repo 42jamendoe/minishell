@@ -97,7 +97,7 @@ void	ft_execute_cmd(t_shell *shell, t_cmd *tmp_cmd)
 	{
 		if (execve(binpath, tmp_cmd->sim_cmd, shell->env) < 0)
 		{
-			perror (0);
+			ft_print_error(5);
 			exit(127);
 		}
 	}

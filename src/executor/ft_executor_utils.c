@@ -13,23 +13,112 @@
 
 extern long long	g_status;
 
-int	ft_run_builtin(t_shell *shell, t_cmd *tmp_cmd)
+int	ft_handle_left_side(t_shell *shell, t_cmd *tmp_cmd, \
+int tmp_pipe[2], int backup[2])
 {
-	if (tmp_cmd->function_name == 1)
-		g_status = ft_echo(tmp_cmd);
-	else if (tmp_cmd->function_name == 2)
-		g_status = ft_cd(shell, tmp_cmd);
-	else if (tmp_cmd->function_name == 3)
-		g_status = ft_pwd();
-	else if (tmp_cmd->function_name == 4)
-		g_status = ft_export(shell, tmp_cmd);
-	else if (tmp_cmd->function_name == 5)
-		g_status = ft_unset(shell, tmp_cmd);
-	else if (tmp_cmd->function_name == 6)
-		g_status = ft_env(shell);
-	else if (tmp_cmd->function_name == 7)
-		ft_exit(shell, tmp_cmd);
+	int	bad;
+
+	bad = 0;
+	if (tmp_cmd->in)
+	{
+		tmp_pipe[0] = ft_check_redir_in(tmp_cmd);
+		if (dup2(tmp_pipe[0], STDIN_FILENO) < 0 || bad)
+			bad = ft_exit_mem_error(shell, 0);
+		close(tmp_pipe[0]);
+	}
 	else
-		return (-1);
-	return (g_status);
+	{
+		if ((!tmp_cmd->order_id || !tmp_cmd->prev_has_redirout) && !bad)
+			bad = ft_handle_middle_in_left_side(shell, tmp_cmd, \
+			tmp_pipe);
+		else if (tmp_cmd->prev_has_redirout && !bad)
+			bad = ft_handle_middle_left_side(shell, tmp_pipe, backup);
+	}
+	return (bad);
+}
+
+int	ft_handle_middle_in_left_side(t_shell *shell, t_cmd *tmp_cmd, \
+int tmp_pipe[2])
+{
+	int	bad;
+
+	bad = 0;
+	if (!tmp_cmd->order_id)
+		tmp_pipe[0] = STDIN_FILENO;
+	else
+	{
+		if (dup2(tmp_pipe[0], STDIN_FILENO) < 0 || bad)
+			bad = ft_exit_mem_error(shell, 0);
+		if (!bad)
+			close(tmp_pipe[0]);
+		if (pipe(tmp_pipe) < 0 || bad)
+			bad = ft_exit_mem_error(shell, 1);
+		if (!bad)
+			close(tmp_pipe[1]);
+	}
+	return (bad);
+}
+
+int	ft_handle_middle_left_side(t_shell *shell, int tmp_pipe[2], int backup[2])
+{
+	int	bad;
+
+	bad = 0;
+	if (dup2(backup[0], tmp_pipe[0]) < 0 || bad)
+		bad = ft_exit_mem_error(shell, 0);
+	if (dup2(tmp_pipe[0], STDIN_FILENO) < 0 || bad)
+		bad = ft_exit_mem_error(shell, 0);
+	if (!bad)
+		close(tmp_pipe[0]);
+	return (bad);
+}
+
+int	ft_handle_middle_right_side(t_shell *shell, t_cmd *tmp_cmd, \
+int tmp_pipe[2], int backup[2])
+{
+	int	bad;
+
+	bad = 0;
+	if (tmp_cmd->order_id == shell->cmd_nbr - 1)
+	{
+		tmp_pipe[1] = STDOUT_FILENO;
+		if (tmp_cmd->out)
+			tmp_pipe[1] = ft_check_redir_out(tmp_cmd);
+		else
+		{
+			if (dup2(backup[1], tmp_pipe[1]) < 0 || bad)
+				bad = ft_exit_mem_error(shell, 0);
+		}
+		if (dup2(tmp_pipe[1], STDOUT_FILENO) < 0 || bad)
+			bad = ft_exit_mem_error(shell, 0);
+	}
+	return (bad);
+}
+
+int	ft_handle_right_side(t_shell *shell, t_cmd *tmp_cmd, \
+int tmp_pipe[2])
+{
+	int	bad;
+
+	bad = 0;
+	if (tmp_cmd->order_id != (shell->cmd_nbr - 1))
+	{
+		if (tmp_cmd->next->in)
+			tmp_pipe[1] = tmp_pipe[1];
+		else
+		{
+			if (tmp_cmd->out)
+				tmp_pipe[1] = ft_check_redir_out(tmp_cmd);
+			else
+			{
+				if (pipe(tmp_pipe) < 0 || bad)
+					bad = ft_exit_mem_error(shell, 1);
+			}
+		}
+		if (dup2(tmp_pipe[1], STDOUT_FILENO) < 0 || bad)
+			bad = ft_exit_mem_error(shell, 0);
+		if (!bad)
+			close(tmp_pipe[1]);
+	}
+	return (bad);
 }

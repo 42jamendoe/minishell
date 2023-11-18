@@ -17,6 +17,10 @@ SRC = minishell.c \
 		expander/ft_expander_utils2.c \
 		executor/ft_executor.c \
 		executor/ft_executor_utils.c \
+		executor/ft_executor_utils2.c \
+		error/ft_error.c \
+		error/ft_error_utils.c \
+		error/ft_error_utils2.c \
 		signals/ft_signals.c \
 		redirect/ft_redirect.c \
 		builtins/cd/ft_cd.c \
@@ -30,6 +34,7 @@ SRC = minishell.c \
 		builtins/unset/ft_unset_utils.c \
 		cmd/ft_cmd.c \
 		clean/ft_clean.c \
+		clean/ft_clean_utils.c \
 		tests/ft_tests.c \
 
 OBJ = $(SRC:%.c=$(SRCD)/%.o)

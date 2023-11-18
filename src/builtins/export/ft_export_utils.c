@@ -75,7 +75,7 @@ int	ft_env_with_declare(t_shell *shell)
 			j++;
 		}
 		ft_putchar_fd('\"', STDOUT_FILENO);
-		ft_putendl_fd("", STDOUT_FILENO);	
+		ft_putendl_fd("", STDOUT_FILENO);
 		i++;
 	}
 	return (EXIT_SUCCESS);

@@ -11,53 +11,6 @@
 /* ************************************************************************** */
 #include "../includes/minishell.h"
 
-// int	ft_count_redir_in(t_cmd *current_command)
-// {
-// 	t_cmd *tmp_cmd;
-// 	int		i;
-//
-// 	tmp_cmd = current_command;
-// 	if (!tmp_cmd->redir)
-// 	{
-// 		while (tmp_cmd->redir)
-// 		{
-// 			if(tmp_cmd->redir->name == LESS || tmp_cmd->redir->name == LESSLESS)
-// 				i++;
-// 			tmp_cmd->redir = tmp_cmd->redir->next;
-// 		}
-// 	}
-// 	return (i);
-// }
-// int	ft_count_redir_out(t_cmd *current_command)
-// {
-// 	t_cmd *tmp_cmd;
-// 	int		i;
-// 	tmp_cmd = current_command;
-// 	if (!tmp_cmd->redir)
-// 	{
-// 		while (tmp_cmd->redir)
-// 		{
-// 			if(tmp_cmd->redir->name == GREAT || 
-// tmp_cmd->redir->name == GREATGREAT)
-// 				i++;
-// 			tmp_cmd->redir = tmp_cmd->redir->next;
-// 		}
-// 	}
-// 	return (i);
-// }
-
-// int	ft_check_next(t_token *tmp_token)
-// {
-// 	t_token *next_token;
-
-	
-// 	if (tmp_token->next)
-// 		next_token = tmp_token->next;
-// 	if(next_token-)
-
-// 	if (tmp)
-// }
-
 void	ft_check_redir(t_cmd *current_command)
 {
 	t_token	*tmp_token;
@@ -68,7 +21,6 @@ void	ft_check_redir(t_cmd *current_command)
 	current_command->prev_has_redirout = 0;
 	if (tmp_token)
 	{
-		//current_command->next_has_redirin = ft_check_next(tmp_token);
 		while (tmp_token)
 		{
 			if (tmp_token->name == LESS || tmp_token->name == LESSLESS)

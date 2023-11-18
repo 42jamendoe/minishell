@@ -13,6 +13,18 @@
 
 long long	g_status = 0;
 
+int	ft_loop_prompt(t_shell *shell)
+{
+	add_history(shell->hist);
+	free(shell->hist);
+	ft_lexer(shell);
+	ft_parser(shell);
+	ft_expander(shell);
+	ft_executor(shell);
+	ft_clean_prompt(shell);
+	return (0);
+}
+
 int	ft_check_prompt(char *input)
 {
 	int	i;
@@ -43,7 +55,9 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_shell	shell;
 	char	*prompt_tmp;
+	int		bad;
 
+	bad = 0;
 	ft_validate_program(argc, argv);
 	ft_prepare_env(&shell, envp);
 	while (1)
@@ -52,22 +66,17 @@ int	main(int argc, char **argv, char **envp)
 		prompt_tmp = readline("minishell$");
 		if (!prompt_tmp)
 			exit(EXIT_SUCCESS);
-		shell.prompt = ft_strdup(prompt_tmp);
-		free(prompt_tmp);
-		ft_check_double_quotes(&shell);
-		if (!ft_check_prompt(shell.prompt) && !ft_check_token_end(&shell) && shell.prompt)
+		else
 		{
-			add_history(shell.prompt);
-			ft_lexer(&shell);
-			ft_parser(&shell);
-			ft_expander(&shell);
-			ft_executor(&shell);
-			ft_clean_prompt(&shell);
+			shell.prompt = ft_strdup(prompt_tmp);
+			shell.hist = ft_strdup(prompt_tmp);
+			if (!shell.prompt || !shell.hist)
+				bad = ft_error_getting_line(&shell);
+			free(prompt_tmp);	
+			if (!ft_check_syntax(&shell) && !bad)
+				ft_loop_prompt(&shell);
 		}
 	}
 	ft_clean_exit(&shell);
-	(void)(argc);
-	(void)(argv);
-	(void)(envp);
 	return (EXIT_SUCCESS);
 }

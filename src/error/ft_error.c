@@ -13,14 +13,14 @@
 
 int	ft_check_token_valid(t_shell *shell)
 {
-	t_token *check;
+	t_token	*check;
 
 	check = shell->token_list;
 	if (check->next)
 	{
-		if(check->name == check->next->name && check->name != WORD)
+		if (check->name == check->next->name && check->name != WORD)
 		{
-			ft_putstr_fd("minishell: syntax error near unexpected token ", STDERR_FILENO);
+			ft_print_error(1);
 			if (check->next->name == PIPE)
 				ft_putstr_fd("'|'\n", STDERR_FILENO);
 			if (check->next->name == GREAT)
@@ -39,28 +39,27 @@ int	ft_check_token_valid(t_shell *shell)
 }
 
 void	ft_check_token_end_last(t_shell *shell, int i)
-{	
-		if (i > 2)
+{
+	if (i > 2)
+	{
+		if (shell->prompt[i - 1] == '>' && shell->prompt[i - 2] == '>')
 		{
-			if (shell->prompt[i - 1] == '>' && shell->prompt[i - 2] == '>')
-			{
-				ft_putstr_fd("minishell: syntax error near unexpected token 'newline'\n", STDERR_FILENO);
-				return ;
-			}
-			if (shell->prompt[i - 1] == '<' && shell->prompt[i - 2] == '<')
-			{
-				ft_putstr_fd("minishell: syntax error near unexpected token 'newline'\n", STDERR_FILENO);
-				return ;
-			}
+			ft_print_error(0);
+			return ;
 		}
-		if(shell->prompt[i - 1] == '|')
-			ft_putstr_fd("minishell: syntax error near unexpected token 'newline'\n", STDERR_FILENO);
-		if(shell->prompt[i - 1] == '>')
-			ft_putstr_fd("minishell: syntax error near unexpected token 'newline'\n", STDERR_FILENO);
-		if(shell->prompt[i - 1] == '<')
-			ft_putstr_fd("minishell: syntax error near unexpected token 'newline'\n", STDERR_FILENO);
+		if (shell->prompt[i - 1] == '<' && shell->prompt[i - 2] == '<')
+		{
+			ft_print_error(0);
+			return ;
+		}
+	}
+	if (shell->prompt[i - 1] == '|')
+		ft_print_error(0);
+	if (shell->prompt[i - 1] == '>')
+		ft_print_error(0);
+	if (shell->prompt[i - 1] == '<')
+		ft_print_error(0);
 }
-
 
 int	ft_check_token_end(t_shell *shell)
 {
@@ -71,100 +70,60 @@ int	ft_check_token_end(t_shell *shell)
 	check = shell->prompt;
 	if (ft_check_double_pipe(shell))
 	{
-		ft_putendl_fd("minishell: syntax error near unexpected token '|'", STDERR_FILENO);
+		ft_print_error(2);
 		return (EXIT_FAILURE);
 	}
 	while (check[i] != '\0')
 		i++;
-	while (i > 0)
-	{
-		if (check[i - 1] == ' ')
-			i--;
-		else
-			break ;
-		check[i] = '\0';
-	}
+	ft_remove_spaces(check, i);
 	if (i > 0)
 	{
 		if (check[i - 1] == '|' || check[i - 1] == '>' || check[i - 1] == '<')
 		{
 			ft_check_token_end_last(shell, i);
-			add_history(shell->prompt);
-			free(shell->prompt);
 			return (EXIT_FAILURE);
 		}
 	}
 	return (EXIT_SUCCESS);
 }
 
-int	ft_check_double_pipe(t_shell *shell)
+void	ft_print_error(int msg)
 {
-	int		i;
-	char	*uni;
-
-	i = 0;
-	uni = shell->prompt;
-	while (uni[i] != '\0')
-	{
-		if (uni[i] == '|')
-		{
-			if (uni[i + 1] != '\0')
-			{
-				if (uni[i + 1] == '|')
-					return (EXIT_FAILURE);
-				while (uni[i + 1] == ' ' && uni[i + 1] != '\0')
-					i++;
-				if (uni[i + 1] == '|')
-					return (EXIT_FAILURE);
-			}
-			else if (uni[0] == '|')
-				return (EXIT_FAILURE);
-		}
-		else
-			i++;
-	}
-	return (EXIT_SUCCESS);
+	if (msg == 0)
+		ft_putstr_fd("minishell: syntax error near unexpected \
+token 'newline'\n", STDERR_FILENO);
+	if (msg == 1)
+		ft_putstr_fd("minishell: syntax error near unexpected \
+token ", STDERR_FILENO);
+	if (msg == 2)
+		ft_putendl_fd("minishell: syntax error near unexpected \
+token '|'", STDERR_FILENO);
+	if (msg == 3)
+		ft_putendl_fd("minishell: unclosed quote", STDERR_FILENO);
+	if (msg == 4)
+		ft_putendl_fd("minishell: memory error", STDERR_FILENO);
+	if (msg == 5)
+		ft_putendl_fd("minishell: command not found", STDERR_FILENO);
 }
 
-
-void ft_erase_double_quotes(t_shell *shell, int i, int j)
+int	ft_check_syntax(t_shell *shell)
 {
-	if (j < 0)
-		shell->prompt[i] = ' ';
-	else
+	int bad;
+
+	if (shell->prompt)
 	{
-		shell->prompt[i] = ' ';
-		shell->prompt[j] = ' ';
-	}
-
-}
-
-void	ft_check_double_quotes(t_shell *shell)
-{
-	int		i;
-	int j;
-	char	*uni;
-
-	i = 0;
-	uni = shell->prompt;
-	while (uni[i] != '\0')
-	{
-		j = i + 1;
-		if (uni[i] == '"')
+		bad = ft_check_quotes_number(shell);
+		if (!bad)
+			ft_check_double_quotes(shell);
+		if (!bad)
+			bad = ft_check_prompt(shell->prompt);
+		if (!bad)
+			bad = ft_check_token_end(shell);
+		if (bad)
 		{
-			if (uni[j] != '\0')
-			{
-				if (uni[j] == '"')
-					ft_erase_double_quotes(shell, i, j);
-				while (uni[j] == ' ' && uni[j] != '\0')
-					j++;
-				if (uni[j] == '|')
-					ft_erase_double_quotes(shell, i, j);
-			}
-			else if (uni[0] == '"')
-				ft_erase_double_quotes(shell, i, -1);
+			add_history(shell->hist);
+			free(shell->hist);
 		}
-		else
-			i = j;
 	}
+	return (bad);
 }

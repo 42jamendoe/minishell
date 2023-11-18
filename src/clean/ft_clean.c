@@ -21,7 +21,7 @@ void	ft_clean_token(t_token *token_to_clean)
 	token_to_clean = NULL;
 	if (cl_token)
 	{
-		while (cl_token)
+		while (cl_token->next)
 		{
 			if (cl_token->next)
 				cl_token_anchor = cl_token->next;
@@ -55,14 +55,12 @@ void	ft_clean_command(t_cmd *cmd_to_clean)
 	t_cmd	*cl_command_anchor;
 
 	cl_command = cmd_to_clean;
-	cl_command_anchor = NULL;
-	cmd_to_clean = NULL;
+	cl_command_anchor = cmd_to_clean;
 	if (cl_command)
 	{
 		while (cl_command)
 		{
-			if (cl_command->next)
-				cl_command_anchor = cl_command->next;
+			cl_command_anchor = cl_command->next;
 			ft_clean_token(cl_command->redir);
 			ft_clean_char(cl_command->sim_cmd);
 			free(cl_command);
@@ -81,21 +79,3 @@ void	ft_clean(t_shell *shell, int error)
 		ft_putendl_fd("minishell: error getting prompt", STDOUT_FILENO);
 	exit (EXIT_FAILURE);
 }
-
-void	ft_clean_prompt(t_shell *shell)
-{
-	ft_clean_command(shell->command_list);
-	ft_clean_token(shell->token_list);
-	free(shell->prompt);
-}
-
-void	ft_clean_exit(t_shell *shell)
-{
-	ft_clean_command(shell->command_list);
-	ft_clean_char(shell->env);
-	ft_clean_token(shell->token_list);
-	free(shell->prompt);
-
-}
-
-// void	ft_reset_

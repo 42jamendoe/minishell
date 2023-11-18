@@ -86,10 +86,12 @@ typedef struct s_shell
 	t_token	*token_list;
 	char	**env;
 	char	*prompt;
+	char	*hist;
 	int		cmd_nbr;
 	t_cmd	*command_list;
 }	t_shell;
 
+int				ft_loop_prompt(t_shell *shell);
 int				ft_check_prompt(char *input);
 void			ft_validate_program(int argc, char **argv);
 void			ft_change_env_path(t_shell *shell, char *newd, char *path);
@@ -99,7 +101,7 @@ int				ft_valid_option(t_cmd *tmp_cmd);
 int				ft_echo(t_cmd *tmp_cmd);
 int				ft_env(t_shell *shell);
 void			ft_get_exit_arg(char *arg);
-int 			ft_check_exit_arg(char *arg);
+int				ft_check_exit_arg(char *arg);
 void			ft_exit(t_shell *shell, t_cmd *tmp_cmd);
 int				ft_check_env_item(t_shell *shell, char *arg, int *i);
 int				ft_position_of_equal(char *arg);
@@ -135,9 +137,16 @@ void			ft_execute_cmd(t_shell *shell, t_cmd *tmp_cmd);
 void			ft_prepare_env(t_shell *shell, char **envp);
 int				ft_create_env(t_shell *shell, char **env);
 char			**ft_get_paths(t_shell *shell);
-void			ft_handle_left_side(int cmd_nbr, t_cmd *tmp_cmd, \
+int				ft_handle_left_side(t_shell *shell, t_cmd *tmp_cmd, \
 int tmp_pipe[2], int backup[2]);
-void			ft_handle_right_side(t_cmd *tmp_cmd, int tmp_pipe[2]);
+int				ft_handle_middle_in_left_side(t_shell *shell, \
+t_cmd *tmp_cmd, int tmp_pipe[2]);
+int				ft_handle_middle_left_side(t_shell *shell, \
+int tmp_pipe[2], int backup[2]);
+int				ft_handle_right_side(t_shell *shell, t_cmd *tmp_cmd, \
+int tmp_pipe[2]);
+int				ft_handle_middle_right_side(t_shell *shell, t_cmd *tmp_cmd, \
+int tmp_pipe[2], int backup[2]);
 void			ft_run_command(t_shell *shell, t_cmd *tmp_cmd);
 void			ft_executor(t_shell *shell);
 int				ft_run_builtin(t_shell *shell, t_cmd *tmp_cmd);
@@ -185,11 +194,22 @@ int				ft_check_redir_in(t_cmd *current_command);
 int				ft_check_redir_out(t_cmd *crt_cmd);
 void			ft_handle_sigint(int sig);
 void			ft_config_signals(void);
-int	ft_check_token_valid(t_shell *shell);
-int	ft_check_token_end(t_shell *shell);
-void	ft_check_token_end_last(t_shell *shell, int i);
-int	ft_check_double_pipe(t_shell *shell);
-void	ft_check_double_quotes(t_shell *shell);
-
-void ft_erase_double_quotes(t_shell *shell, int i, int j);
+int				ft_check_token_valid(t_shell *shell);
+int				ft_check_token_end(t_shell *shell);
+void			ft_check_token_end_last(t_shell *shell, int i);
+int				ft_check_double_pipe(t_shell *shell);
+void			ft_check_double_quotes(t_shell *shell);
+int				ft_erase_double_quotes(t_shell *shell, int i, int j);
+int				ft_run_executor(t_shell *shell, t_cmd *tmp_cmd, \
+int tmp_pipe[2], int backup[2]);
+int				ft_prepare_executor(t_shell *shell, int backup[2]);
+int				t_finish_executor(t_shell *shell, int backup[2]);
+int				ft_exit_mem_error(t_shell *shell, int msg);
+void			ft_fork(t_shell *shell, t_cmd *tmp_cmd);
+void			ft_print_error(int msg);
+int				ft_remove_spaces(char *check, int i);
+int				ft_check_syntax(t_shell *shell);
+int				ft_check_quotes_number(t_shell *shell);
+int 			ft_change_quotes_state(int c, int sqt, int dqt);
+int 			ft_error_getting_line(t_shell *shell);
 #endif
