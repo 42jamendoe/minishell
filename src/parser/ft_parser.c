@@ -100,6 +100,8 @@ void	ft_parser(t_shell *shell)
 		tmp_cmd->arg_nbr = ft_command_args_number(shell->token_list) + 1;
 		tmp_cmd->sim_cmd = (char **) malloc (sizeof(char *) \
 		* tmp_cmd->arg_nbr);
+		tmp_cmd->in = 0;
+		tmp_cmd->out = 0;
 		tmp_cmd->redir = NULL;
 		tmp_cmd->next = NULL;
 		ft_create_command(shell, tmp_cmd);

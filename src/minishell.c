@@ -11,9 +11,9 @@
 /* ************************************************************************** */
 #include "../includes/minishell.h"
 
-long long	g_status = 0;
+long long g_status = 0;
 
-int	ft_loop_prompt(t_shell *shell)
+int ft_loop_prompt(t_shell *shell)
 {
 	add_history(shell->hist);
 	free(shell->hist);
@@ -25,9 +25,9 @@ int	ft_loop_prompt(t_shell *shell)
 	return (0);
 }
 
-int	ft_check_prompt(char *input)
+int ft_check_prompt(char *input)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	if (input == NULL)
@@ -42,23 +42,29 @@ int	ft_check_prompt(char *input)
 	return (0);
 }
 
-void	ft_validate_program(int argc, char **argv)
+void ft_validate_program(t_shell *shell, int argc, char **argv)
 {
 	if (argc > 1 && *argv[1])
 	{
 		ft_putendl_fd("minishell: Type only <./minishell>", STDOUT_FILENO);
-		exit (EXIT_SUCCESS);
+		exit(EXIT_SUCCESS);
 	}
+	shell->cmd_nbr = 0;
+	shell->command_list = NULL;
+	shell->env = NULL;
+	shell->hist = NULL;
+	shell->prompt = NULL;
+	shell->token_list = NULL;
 }
 
-int	main(int argc, char **argv, char **envp)
+int main(int argc, char **argv, char **envp)
 {
-	t_shell	shell;
-	char	*prompt_tmp;
-	int		bad;
+	t_shell shell;
+	char *prompt_tmp;
+	int bad;
 
 	bad = 0;
-	ft_validate_program(argc, argv);
+	ft_validate_program(&shell, argc, argv);
 	ft_prepare_env(&shell, envp);
 	while (1)
 	{
@@ -72,7 +78,7 @@ int	main(int argc, char **argv, char **envp)
 			shell.hist = ft_strdup(prompt_tmp);
 			if (!shell.prompt || !shell.hist)
 				bad = ft_error_getting_line(&shell);
-			free(prompt_tmp);	
+			free(prompt_tmp);
 			if (!ft_check_syntax(&shell) && !bad)
 				ft_loop_prompt(&shell);
 		}

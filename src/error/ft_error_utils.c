@@ -79,9 +79,9 @@ void ft_check_double_quotes(t_shell *shell)
 	while (uni[i] != '\0')
 	{
 		j = i + 1;
-		if (uni[j] == '"')
+		if (uni[i] == '"')
 		{
-			i += ft_erase_double_quotes(shell, i, j);
+			i = ft_erase_double_quotes(shell, i, j);
 		}
 		else
 			i = j;

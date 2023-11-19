@@ -93,7 +93,7 @@ typedef struct s_shell
 
 int				ft_loop_prompt(t_shell *shell);
 int				ft_check_prompt(char *input);
-void			ft_validate_program(int argc, char **argv);
+void			ft_validate_program(t_shell *shell, int argc, char **argv);
 void			ft_change_env_path(t_shell *shell, char *newd, char *path);
 void			ft_print_error_cd(char *directory);
 int				ft_cd(t_shell *shell, t_cmd *tmp_cmd);
@@ -162,7 +162,7 @@ t_state			ft_define_state(char c, int *dq);
 char			*ft_state_is_default(t_shell *shell, char *arg, int *position);
 char			*ft_state_is_squote(char *arg, int *position);
 char			*ft_state_is_dquote(t_shell *shell, char *arg, \
-int *position, t_state arg_state);
+int *position, int *dq);
 char			*ft_expand_dollar(t_shell *shell, char *arg, int anchor, \
 int position);
 char			*ft_expand_text(char *arg, int anchor, int position);
@@ -212,4 +212,6 @@ int				ft_check_syntax(t_shell *shell);
 int				ft_check_quotes_number(t_shell *shell);
 int 			ft_change_quotes_state(int c, int sqt, int dqt);
 int 			ft_error_getting_line(t_shell *shell);
+
+int	ft_get_word(t_shell *shell, int i, int j);
 #endif

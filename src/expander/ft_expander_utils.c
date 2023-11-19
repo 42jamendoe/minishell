@@ -22,7 +22,10 @@ t_state	ft_define_state(char c, int *dq)
 	}
 	else if (c == '"')
 	{
-		(*dq) = 1;
+		if ((*dq) == 0)
+			(*dq) = 1;
+		else
+			(*dq) = 0;
 		return (DQUOTE);
 	}
 	else
@@ -35,11 +38,19 @@ char	*ft_state_is_default(t_shell *shell, char *arg, int *position)
 	char	*expanded;
 
 	anchor = (*position);
-	while (arg[(*position)] != '\0' && arg[(*position)] != ' ' \
-	&& arg[(*position)] != '\"' && arg[(*position)] != '\'')
-		(*position)++;
+	if (arg[(*position) + 1] == '\?')
+		(*position) += 2;
+	else
+	{
+		if (arg[(*position)] == '$')
+			(*position) += 1;
+		while (arg[(*position)] != '\0' && arg[(*position)] != ' ' \
+		&& arg[(*position)] != '\"' && arg[(*position)] != '\'' \
+		&& arg[(*position)] != '$')
+			(*position)++;
+	}
 	expanded = ft_process_arg(shell, arg, anchor, (*position));
-	if (arg[(*position)] == ' ' || arg[(*position)] == '\"')
+	if (arg[(*position)] == ' ')
 		(*position)++;
 	return (expanded);
 }
@@ -55,28 +66,28 @@ char	*ft_state_is_squote(char *arg, int *position)
 		expanded = ft_strdup("\0");
 	else
 	{
-		while (arg[(*position)] != '\'')
+		while (arg[(*position)] != '\'' && arg[(*position)] != '\0')
 			(*position)++;
 		expanded = ft_expand_text(arg, anchor, (*position));
-		(*position)++;
+		if (arg[(*position)] != '\0')
+			(*position)++;
 	}
 	if (!expanded)
 		return (NULL);
-	return (expanded);
-}
+	return (expanded);}
 
 char	*ft_state_is_dquote(t_shell *shell, char *arg, \
-int *position, t_state arg_state)
+int *position, int *dq)
 {
 	int		anchor;
 	char	*expanded;
 
-	if (arg_state == DQUOTE)
-		(*position)++;
+	(void)(shell);
+	(*position)++;
 	anchor = (*position);
 	while (arg[(*position)] != '\"' && arg[(*position)] != '$')
 		(*position)++;
-	if ((*position) - anchor == 0 && arg_state == DQUOTE)
+	if ((*position) - anchor == 0)
 	{
 		expanded = ft_strdup("\0");
 		if (arg[(*position)] == '\"')
@@ -84,10 +95,13 @@ int *position, t_state arg_state)
 	}
 	else
 	{
-		expanded = ft_process_arg(shell, arg, anchor, (*position));
-		if ((arg[(*position)] == ' ' || arg[(*position)] == '\"') \
-		&& arg_state == DQUOTEOPEN)
+		expanded = ft_expand_text(arg, anchor, (*position));
+		if (arg[(*position)] == '\"')
+{
 			(*position)++;
+			(*dq) = 0;
+}
+
 	}
 	if (!expanded)
 		return (NULL);

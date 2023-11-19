@@ -48,27 +48,54 @@ int	ft_create_token(t_shell *shell, int i, t_token_name name)
 	return (j);
 }
 
+int	ft_get_word(t_shell *shell, int i, int j)
+{
+	int sqo;
+	int	dqo;
+
+	sqo = -1;
+	dqo = -1;
+	while (shell->prompt[i + j] && ((shell->prompt[i + j] != ' ' && \
+	shell->prompt[i + j] != '<' && shell->prompt[i + j] != '>' && \
+	shell->prompt[i + j] != '|') || ((sqo * dqo) < 0)))
+	{
+		if (shell->prompt[i + j] == '\'' || shell->prompt[i + j] == '"')
+		{			
+			if (shell->prompt[i + j] == '"' && sqo < 0)
+				dqo *= -1;
+			if (shell->prompt[i + j] == '\'' && dqo < 0)
+				sqo *= -1;
+		}
+		j++;
+	}
+	return (j);
+}
+
+
 int	ft_create_word(t_shell *shell, int i, t_token_name name)
 {
 	int		j;
 	char	*word_tmp;
 	t_token	*new_word;
 
-	j = 0;
+
 	word_tmp = NULL;
 	if (name != PIPE)
-	{
+	{	
+		j = 0;
+		while (shell->prompt[i + j] != '\0' && shell->prompt[i + j] != ' ')
+		{
 		if (shell->prompt[i + j] && (shell->prompt[i + j] == '\'' \
 		|| shell->prompt[i + j] == '"'))
-			j += ft_handle_quotes(shell->prompt, i, shell->prompt[i]);
+			j += ft_handle_quotes(shell->prompt, i + j, shell->prompt[i + j]);
 		else
 		{
-			while (shell->prompt[i + j] && shell->prompt[i + j] != ' ' && \
-			shell->prompt[i + j] != '<' && shell->prompt[i + j] != '>' && \
-			shell->prompt[i + j] != '|')
+			if (shell->prompt[i + j] != '\0')
 				j++;
 		}
-		word_tmp = ft_substr(&shell->prompt[i], 0, j);
+		// 	j++;//= ft_get_word(shell, i, j);
+		}
+		word_tmp = ft_substr(shell->prompt, i, i + j);
 		if (!word_tmp)
 			ft_clean(shell, 1);
 	}

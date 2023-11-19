@@ -18,7 +18,7 @@ char	*ft_expand_arg(t_shell *shell, char *arg, int *position, int *dq)
 
 	expanded = NULL;
 	arg_state = ft_define_state(arg[(*position)], &(*dq));
-	if (arg_state == DEFAULT)
+	if (arg_state == DEFAULT  || arg_state == DQUOTEOPEN)
 	{
 		expanded = ft_state_is_default(shell, arg, &(*position));
 	}
@@ -26,9 +26,9 @@ char	*ft_expand_arg(t_shell *shell, char *arg, int *position, int *dq)
 	{
 		expanded = ft_state_is_squote(arg, &(*position));
 	}
-	else if (arg_state == DQUOTE || arg_state == DQUOTEOPEN)
+	else if (arg_state == DQUOTE)
 	{
-		expanded = ft_state_is_dquote(shell, arg, &(*position), arg_state);
+		expanded = ft_state_is_dquote(shell, arg, &(*position), &(*dq));
 	}
 	if (!expanded)
 		return (NULL);
@@ -49,7 +49,9 @@ char	*ft_exp_command(t_shell *shell, t_cmd *tmp_cmd, int nbr, int position)
 	while (tmp_cmd->sim_cmd[nbr][position] != '\0')
 	{
 		tmp_word = ft_expand_arg(shell, tmp_cmd->sim_cmd[nbr], &position, &dq);
-		if (expanded[0] == '\0')
+		if (!tmp_word)
+			join = ft_strdup(expanded);
+		else if (expanded[0] == '\0')
 			join = tmp_word;
 		else
 		{
@@ -127,6 +129,8 @@ void	ft_expander(t_shell *shell)
 		}
 		if (tmp_command->redir)
 			ft_exp_redir(shell, tmp_command);
+		if (!tmp_command->next)
+			break ;
 		tmp_command = tmp_command->next;
 	}
 }
