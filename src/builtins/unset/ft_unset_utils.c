@@ -53,6 +53,7 @@ int	ft_check_list(t_shell *shell, char **env_unset)
 	int	var_exists;
 
 	j = 0;
+	var_exists = 0;
 	while (shell->env[j])
 	{
 		i = 1;

@@ -110,6 +110,7 @@ int	ft_check_syntax(t_shell *shell)
 {
 	int bad;
 
+	bad =0;
 	if (shell->prompt)
 	{
 		bad = ft_check_quotes_number(shell);

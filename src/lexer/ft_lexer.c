@@ -78,7 +78,7 @@ int	ft_create_word(t_shell *shell, int i, t_token_name name)
 	char	*word_tmp;
 	t_token	*new_word;
 
-
+j = 0;
 	word_tmp = NULL;
 	if (name != PIPE)
 	{	

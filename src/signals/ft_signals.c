@@ -18,9 +18,9 @@ void	ft_handle_sigint(int sig)
 	if (sig == SIGINT)
 	{
 		ft_putchar_fd('\n', STDOUT_FILENO);
-		rl_on_new_line();
-		rl_replace_line("", 0);
-		rl_redisplay();
+		// rl_on_new_line();
+		// rl_replace_line("", 0);
+		// rl_redisplay();
 		g_status = 130;
 	}
 }
