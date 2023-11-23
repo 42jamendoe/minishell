@@ -87,7 +87,7 @@ int *position, int *dq)
 	anchor = (*position);
 	while (arg[(*position)] != '\"' && arg[(*position)] != '$')
 		(*position)++;
-	if ((*position) - anchor == 0)
+	if ((*position) - anchor == 0 && arg[(*position)] != '$')
 	{
 		expanded = ft_strdup("\0");
 		if (arg[(*position)] == '\"')

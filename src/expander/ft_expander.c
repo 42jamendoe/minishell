@@ -43,6 +43,7 @@ char	*ft_exp_command(t_shell *shell, t_cmd *tmp_cmd, int nbr, int position)
 	int		dq;
 
 	dq = 0;
+	join = NULL;
 	expanded = ft_strdup("\0");
 	if (!expanded)
 		return (NULL);
@@ -62,6 +63,8 @@ char	*ft_exp_command(t_shell *shell, t_cmd *tmp_cmd, int nbr, int position)
 			return (NULL);
 		free(expanded);
 		expanded = join;
+		if (dq == 1)
+			position++;
 	}
 	return (expanded);
 }
