@@ -92,7 +92,6 @@ int	ft_validate_arg_export(char **env)
 int	ft_export(t_shell *shell, t_cmd *tmp_cmd)
 {
 	int		indexes[4];
-	char	**new_env;
 
 	if (!tmp_cmd->sim_cmd[1])
 		g_status = ft_env_with_declare(shell);
@@ -104,7 +103,7 @@ int	ft_export(t_shell *shell, t_cmd *tmp_cmd)
 		if (indexes[1] < 0)
 			g_status = 1;
 		else
-			ft_export_var(shell, tmp_cmd, indexes, new_env);
+			ft_export_var(shell, tmp_cmd, indexes);
 	}
 	return (g_status);
 }
