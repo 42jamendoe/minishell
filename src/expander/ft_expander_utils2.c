@@ -50,3 +50,31 @@ char	*ft_get_env_value(char *env)
 		return (NULL);
 	return (env_value);
 }
+
+void	ft_change_quote_state_begin(char *str, int *index, int quotes[2])
+{
+	if (str[(*index)] == '"' && (quotes[1]) == -1 && (quotes[0]) == -1)
+	{
+		(quotes[1]) = 1;
+		(*index)++;
+	}
+	else if (str[(*index)] == '\'' && (quotes[1]) == -1 && (quotes[0]) == -1)
+	{
+		(quotes[0]) = 1;
+		(*index)++;
+	}
+}
+
+void	ft_change_quote_state_end(char *str, int *index, int quotes[2])
+{
+	if (str[(*index)] == '"' && (quotes[1]) == 1)
+	{
+		(quotes[1]) = -1;
+		(*index)++;
+	}
+	else if (str[(*index)] == '\'' && (quotes[0]) == 1)
+	{
+		(quotes[0]) = -1;
+		(*index)++;
+	}
+}

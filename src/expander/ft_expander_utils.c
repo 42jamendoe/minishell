@@ -99,58 +99,22 @@ char	*ft_expand_dollar_sign_11(t_shell *shell, char *str, int *index)
 	return (tmp_word);
 }
 
-void	ft_change_quote_state_begin(char *str, int *index, int *sq, int *dq)
-{
-	if (str[(*index)] == '"' && (*dq) == -1 && (*sq) == -1)
-	{
-		(*dq) = 1;
-		(*index)++;
-	}
-	else if (str[(*index)] == '\'' && (*dq) == -1 && (*sq) == -1)
-	{
-		(*sq) = 1;
-		(*index)++;
-	}
-}
-
-void	ft_change_quote_state_end(char *str, int *index, int *sq, int *dq)
-{
-	if (str[(*index)] == '"' && (*dq) == 1)
-	{
-		(*dq) = -1;
-		(*index)++;
-	}
-	else if (str[(*index)] == '\'' && (*sq) == 1)
-	{
-		(*sq) = -1;
-		(*index)++;
-	}
-}
-
 char	*ft_test_change_state(t_shell *shell, \
-char *to_expand, int *position, int *sq, int *dq)
+char *to_expand, int *position, int quotes[2])
 {
 	char	*tmp_word;
 
-	if ((*dq) == -1 && (*sq) == -1)
+	if ((quotes[1]) == -1 && (quotes[0]) == -1)
 		tmp_word = ft_expand_dollar_sign_00(shell, to_expand, &(*position));
-	else if ((*dq) == 1 && (*sq) == -1)
+	else if ((quotes[1]) == 1 && (quotes[0]) == -1)
 		tmp_word = ft_expand_dollar_sign_01(shell, to_expand, &(*position));
-	else if ((*sq) == 1)
+	else if ((quotes[0]) == 1)
 	{
 		tmp_word = ft_expand_dollar_sign_1_(shell, to_expand, &(*position));
-		(*sq) *= -1;
+		(quotes[0]) *= -1;
 	}
-	else if ((*dq) == 1 && (*sq) == 1)
+	else if ((quotes[1]) == 1 && (quotes[0]) == 1)
 		tmp_word = ft_expand_dollar_sign_11(shell, to_expand, &(*position));
-	ft_change_quote_state_end(to_expand, &(*position), &(*sq), &(*dq));
+	ft_change_quote_state_end(to_expand, &(*position), quotes);
 	return (tmp_word);
-}
-
-char	*ft_join_not_null(char *join, char *expanded)
-{
-	if (join)
-		return (join);
-	free(expanded);
-	return (NULL);
 }

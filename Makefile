@@ -15,7 +15,7 @@ SRC = minishell.c \
 		expander/ft_expander.c \
 		expander/ft_expander_utils.c \
 		expander/ft_expander_utils2.c \
-		expander/ft_expander_utils4.c \
+		expander/ft_expander_utils3.c \
 		executor/ft_executor.c \
 		executor/ft_executor_utils.c \
 		executor/ft_executor_utils2.c \

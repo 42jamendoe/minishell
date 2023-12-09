@@ -171,7 +171,7 @@ void			ft_clean_char(char **char_to_clean);
 void			ft_clean_command(t_cmd *cmd_to_clean);
 void			ft_clean(t_shell *shell, int error);
 void			ft_clean_env(t_shell *shell);
-void			ft_clean_prompt(t_shell *shell);
+int				ft_clean_prompt(t_shell *shell);
 void			ft_clean_exit(t_shell *shell);
 int				ft_exit_mem_error(t_shell *shell, int msg);
 void			ft_clean_env_invalid(char **list, int i);
@@ -220,11 +220,14 @@ char *str, int *index);
 char			*ft_expand_dollar_sign_11(t_shell *shell, \
 char *str, int *index);
 void			ft_change_quote_state_begin(char *str, \
-int *index, int *sq, int *dq);
+int *index, int quotes[2]);
 void			ft_change_quote_state_end(char *str, \
-int *index, int *sq, int *dq);
+int *index, int quotes[2]);
 char			*ft_test_change_state(t_shell *shell, \
-char *to_expand, int *position, int *sq, int *dq);
+char *to_expand, int *position, int quotes[2]);
 char			*ft_join_not_null(char *join, char *expanded);
+int				ft_loop_tmp_word(t_shell *shell);
+int				ft_handle_left_side_noredir(t_shell *shell, t_cmd *tmp_cmd, \
+int tmp_pipe[2], int backup[2]);
 
 #endif

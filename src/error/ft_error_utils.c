@@ -27,15 +27,14 @@ int	ft_remove_spaces(char *check, int i)
 int	ft_check_double_pipe(t_shell *shell)
 {
 	int	i;
-	int	sqt;
-	int	dqt;
+	int	quotes[2];
 
-	i = 0;
-	sqt = -1;
-	dqt = -1;
-	while (shell->prompt[i] != '\0')
+	i = -1;
+	quotes[0] = -1;
+	quotes[1] = -1;
+	while (shell->prompt[++i] != '\0')
 	{
-		if (shell->prompt[i] == '|' && (sqt == -1 && dqt == -1))
+		if (shell->prompt[i] == '|' && (quotes[0] == -1 && quotes[1] == -1))
 		{
 			while (shell->prompt[i] == '|' || shell->prompt[i] == ' ')
 			{
@@ -44,13 +43,12 @@ int	ft_check_double_pipe(t_shell *shell)
 					return (EXIT_FAILURE);
 			}
 		}
-		if (shell->prompt[i] == '\'' && dqt == -1)
-			sqt *= -1;
-		else if (shell->prompt[i] == '"' && sqt == -1)
-			dqt *= -1;
-		i++;
+		if (shell->prompt[i] == '\'' && quotes[1] == -1)
+			quotes[0] *= -1;
+		else if (shell->prompt[i] == '"' && quotes[0] == -1)
+			quotes[1] *= -1;
 	}
-	if (shell->prompt[i] == '\0' && (sqt == 1 || dqt == 1))
+	if (shell->prompt[i] == '\0' && (quotes[0] == 1 || quotes[1] == 1))
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }

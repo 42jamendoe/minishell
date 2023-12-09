@@ -16,19 +16,18 @@ int *position)
 {
 	char	*expanded;
 	char	*join;
-	int		sq;
-	int		dq;
+	int		quotes[2];
 
-	sq = -1;
-	dq = -1;
+	quotes[0] = -1;
+	quotes[1] = -1;
 	join = NULL;
 	expanded = tmp_word;
 	while (to_expand[(*position)] != '\0')
 	{
-		ft_change_quote_state_begin(to_expand, &(*position), &sq, &dq);
+		ft_change_quote_state_begin(to_expand, &(*position), quotes);
 		if (to_expand[(*position)] == '\0')
 			return (ft_join_not_null(join, expanded));
-		tmp_word = ft_test_change_state(shell, to_expand, &(*position), &sq, &dq);
+		tmp_word = ft_test_change_state(shell, to_expand, &(*position), quotes);
 		if (!tmp_word)
 			join = NULL;
 		else
@@ -79,7 +78,8 @@ int	ft_exp_redir(t_shell *shell, t_cmd *tmp_cmd)
 		tmp_word = ft_strdup("");
 		if (!tmp_word)
 			return (0);
-		tmp_word = ft_exp_command(shell, tmp_word, tmp_redir->token_str, &position);
+		tmp_word = ft_exp_command(shell, tmp_word, \
+		tmp_redir->token_str, &position);
 		if (!tmp_word)
 			ft_delete_redir_invalid(tmp_cmd, tmp_redir);
 		tmp_redir->token_str = tmp_word;
@@ -90,28 +90,45 @@ int	ft_exp_redir(t_shell *shell, t_cmd *tmp_cmd)
 	return (0);
 }
 
+int	ft_loop_tmp_word(t_shell *shell)
+{
+	int		arg_count;
+	int		position;
+	char	*tmp_word;
+	t_cmd	*tmp_command;
+
+	arg_count = 1;
+	tmp_command = shell->command_list;
+	while (tmp_command->sim_cmd[arg_count])
+	{
+		tmp_word = ft_strdup("");
+		if (!tmp_word)
+			return (-1);
+		position = 0;
+		tmp_word = ft_exp_command(shell, tmp_word, \
+		tmp_command->sim_cmd[arg_count], &position);
+		if (!tmp_word)
+			return (-1);
+		free(tmp_command->sim_cmd[arg_count]);
+		tmp_command->sim_cmd[arg_count] = tmp_word;
+		arg_count++;
+		if (tmp_command->sim_cmd[arg_count])
+			break ;
+	}
+	return (EXIT_SUCCESS);
+}
+
 int	ft_expander(t_shell *shell)
 {
 	t_cmd	*tmp_command;
-	char	*tmp_word;
-	int		arg_count;
-	int		position;
 
 	tmp_command = shell->command_list;
 	while (tmp_command)
 	{
-		arg_count = 1;
-		while (tmp_command->sim_cmd[arg_count])
+		if (tmp_command->sim_cmd[1])
 		{
-			tmp_word = ft_strdup("");
-			if (!tmp_word)
-				return (0);
-			position = 0;
-			tmp_word = ft_exp_command(shell, tmp_word, \
-			tmp_command->sim_cmd[arg_count], &position);
-			free(tmp_command->sim_cmd[arg_count]);
-			tmp_command->sim_cmd[arg_count] = tmp_word;
-			arg_count++;
+			if (ft_loop_tmp_word(shell))
+				return (EXIT_FAILURE);
 		}
 		if (tmp_command->redir)
 			ft_exp_redir(shell, tmp_command);

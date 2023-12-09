@@ -32,25 +32,9 @@ int tmp_pipe[2], int backup[2])
 		close(tmp_pipe[0]);
 	}
 	else
-	{
-		if ((!tmp_cmd->order_id || !tmp_cmd->prev_has_redirout))
-		{
-			if (ft_handle_middle_in_left_side(shell, tmp_cmd, \
-			tmp_pipe))
-			{
-				ft_clean_prompt(shell);
-				return (EXIT_FAILURE);
-			}
-		}
-		else if (tmp_cmd->prev_has_redirout)
-		{
-			if (ft_handle_middle_left_side(shell, tmp_pipe, backup))
-			{
-				ft_clean_prompt(shell);
-				return (EXIT_FAILURE);
-			}
-		}
-	}
+		if (ft_handle_left_side_noredir(shell, tmp_cmd, \
+&tmp_pipe, &backup))
+			return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
 
@@ -66,7 +50,6 @@ int tmp_pipe[2])
 			ft_clean_prompt(shell);
 			return (EXIT_FAILURE);
 		}
-        //while (read(tmp_pipe[0], STDIN_FILENO, 1));
 		close(tmp_pipe[0]);
 		if (pipe(tmp_pipe) < 0)
 		{
@@ -136,21 +119,15 @@ int tmp_pipe[2])
 			{
 				tmp_pipe[1] = ft_check_redir_out(tmp_cmd);
 				if (tmp_pipe[1] < 0)
-					return (EXIT_FAILURE);
+					return (ft_clean_prompt(shell));
 			}
 			else
 			{
 				if (pipe(tmp_pipe) < 0)
-				{
-					ft_clean_prompt(shell);
-					return (EXIT_FAILURE);
-				}
+					return (ft_clean_prompt(shell));
 			}
 			if (dup2(tmp_pipe[1], STDOUT_FILENO) < 0)
-			{
-				ft_clean_prompt(shell);
-				return (EXIT_FAILURE);
-			}
+				return (ft_clean_prompt(shell));
 		}
 		close(tmp_pipe[1]);
 	}

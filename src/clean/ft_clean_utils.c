@@ -25,11 +25,12 @@ void	ft_clean_env(t_shell *shell)
 		free(shell->env);
 }
 
-void	ft_clean_prompt(t_shell *shell)
+int	ft_clean_prompt(t_shell *shell)
 {
 	ft_clean_command(shell->command_list);
 	ft_clean_token(shell->token_list);
 	free(shell->prompt);
+	return (EXIT_FAILURE);
 }
 
 void	ft_clean_exit(t_shell *shell)

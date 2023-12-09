@@ -14,22 +14,10 @@
 int	ft_run_executor(t_shell *shell, t_cmd *tmp_cmd, \
 int tmp_pipe[2], int backup[2])
 {
-	if (ft_handle_left_side(shell, tmp_cmd, tmp_pipe, backup))
-	{
-		g_status = 1;
-		return (EXIT_FAILURE);
-	}
-	if (ft_handle_middle_right_side(shell, tmp_cmd, tmp_pipe, backup))
-	{
-		g_status = 1;
-		return (EXIT_FAILURE);
-	}
-	if (ft_handle_right_side(shell, tmp_cmd, tmp_pipe))
-	{
-		g_status = 1;
-		return (EXIT_FAILURE);
-	}
-	if (ft_run_command(shell, tmp_cmd))
+	if (ft_handle_left_side(shell, tmp_cmd, tmp_pipe, backup) || \
+	ft_handle_middle_right_side(shell, tmp_cmd, tmp_pipe, backup) || \
+	ft_handle_right_side(shell, tmp_cmd, tmp_pipe) \
+	|| ft_run_command(shell, tmp_cmd))
 	{
 		g_status = 1;
 		return (EXIT_FAILURE);
@@ -97,7 +85,6 @@ int	ft_executor(t_shell *shell)
 	int		backup[2];
 	int		tmp_pipe[2];
 	int		status;
-	pid_t	child_pid;
 
 	status = 0;
 	tmp_cmd = shell->command_list;
@@ -114,13 +101,8 @@ int	ft_executor(t_shell *shell)
 			break ;
 		tmp_cmd = tmp_cmd->next;
 	}
-	while ((child_pid = waitpid(-1, &status, 0)) > 0)
-	{
-        //printf("Child process %d exited with status %d\n", child_pid, status);
-    }
+	waitpid(-1, &status, 0);
 	if (!WTERMSIG(status))
 		g_status = status >> 8;
-	if (ft_finish_executor(shell, backup))
-		return (EXIT_FAILURE);
-	return (EXIT_SUCCESS);
+	return (ft_finish_executor(shell, backup));
 }
