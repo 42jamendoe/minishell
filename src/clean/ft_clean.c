@@ -11,6 +11,15 @@
 /* ************************************************************************** */
 #include "../../includes/minishell.h"
 
+int	ft_clean_memory(t_shell *shell, int fd)
+{
+	if (fd > NO_FD)
+		close(fd);
+	ft_clean_prompt(shell);
+	ft_putendl_fd("minishell: error allocating memory", STDERR_FILENO);
+	return (EXIT_FAILURE);
+}
+
 void	ft_clean_token(t_token *token_to_clean)
 {
 	t_token	*cl_token;

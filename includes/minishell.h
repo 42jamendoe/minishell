@@ -20,6 +20,7 @@
 # define PREV_RED_OUT 1
 # define PREV_NOT_RED_OUT 0
 # define START 2
+# define NO_FD (-1)
 
 # include <stdlib.h>
 # include <signal.h>
@@ -118,7 +119,7 @@ t_token			*ft_create_item(char *token_char, t_token_name token_name);
 int				ft_handle_quotes(char *prompt, int i, int c);
 int				ft_command_number(t_shell *shell);
 t_token_name	ft_check_char(char *prompt, int i);
-char			*ft_exp_command(t_shell *shell, char *to_expand, \
+char			*ft_exp_command(t_shell *shell, char *tmp_word, char *to_expand, \
 int *position);
 void			ft_delete_redir_invalid(t_cmd *tmp_cmd, t_token *invalid);
 int				ft_exp_redir(t_shell *shell, t_cmd *tmp_cmd);
@@ -207,5 +208,16 @@ void			ft_loop_list(char **shell_list, char **unset_list, \
 char **new_env);
 int				ft_check_list(t_shell *shell, char **env_unset);
 int				ft_position_of_equal(char *arg);
+int	ft_clean_memory(t_shell *shell, int fd);
+void	ft_init_count_redir(t_cmd *tmp_cmd);
+char *ft_expand_dollar_sign_00(t_shell *shell, char *str, int *index);
+char *ft_expand_dollar_sign_01(t_shell *shell, char *str, int *index);
+char *ft_expand_dollar_sign_1_(t_shell *shell, char *str, int *index);
+char *ft_expand_dollar_sign_11(t_shell *shell, char *str, int *index);
+void	ft_change_quote_state_begin(char *str, int *index, int *sq, int *dq);
+void	ft_change_quote_state_end(char *str, int *index, int *sq, int *dq);
+char	*ft_test_change_state(t_shell *shell, char *to_expand, int *position, int *sq, int *dq);
+char *ft_join_not_null(char *join, char *expanded);
+
 
 #endif

@@ -97,25 +97,14 @@ int	ft_parser(t_shell *shell)
 	{
 		tmp_cmd = (t_cmd *) malloc (sizeof(t_cmd));
 		if (!tmp_cmd)
-		{
-			ft_clean_prompt(shell);
-			ft_putendl_fd("minishell: type only <./minishell>", STDERR_FILENO);
-			return (EXIT_FAILURE);
-		}
+			return (ft_clean_memory(shell, NO_FD));
 		tmp_cmd->order_id = i;
 		tmp_cmd->arg_nbr = ft_command_args_number(shell->token_list) + 1;
 		tmp_cmd->sim_cmd = (char **) malloc (sizeof(char *) \
 		* tmp_cmd->arg_nbr);
 		if (!tmp_cmd->sim_cmd)
-		{
-			ft_clean_prompt(shell);
-			ft_putendl_fd("minishell: type only <./minishell>", STDERR_FILENO);
-			return (EXIT_FAILURE);
-		}
-		tmp_cmd->in = 0;
-		tmp_cmd->out = 0;
-		tmp_cmd->redir = NULL;
-		tmp_cmd->next = NULL;
+			return (ft_clean_memory(shell, NO_FD));
+		ft_init_count_redir(tmp_cmd);
 		ft_create_command(shell, tmp_cmd);
 		ft_check_redir(tmp_cmd);
 		tmp_cmd->function_name = ft_check_function(tmp_cmd->sim_cmd[0]);

@@ -15,6 +15,7 @@ SRC = minishell.c \
 		expander/ft_expander.c \
 		expander/ft_expander_utils.c \
 		expander/ft_expander_utils2.c \
+		expander/ft_expander_utils4.c \
 		executor/ft_executor.c \
 		executor/ft_executor_utils.c \
 		executor/ft_executor_utils2.c \
@@ -35,7 +36,6 @@ SRC = minishell.c \
 		cmd/ft_cmd.c \
 		clean/ft_clean.c \
 		clean/ft_clean_utils.c \
-		tests/ft_tests.c \
 
 OBJ = $(SRC:%.c=$(SRCD)/%.o)
 

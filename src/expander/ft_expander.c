@@ -9,159 +9,26 @@
 /*   Updated: 2023/08/08 20:20:50 by luaraujo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "../includes/minishell.h"
+#include "../../includes/minishell.h"
 
-char	*ft_exp_command(t_shell *shell, char *to_expand, int *position)
+char	*ft_exp_command(t_shell *shell, char *tmp_word, char *to_expand, \
+int *position)
 {
 	char	*expanded;
-	char	*tmp_word;
 	char	*join;
-	int		anchor;
 	int		sq;
 	int		dq;
 
 	sq = -1;
 	dq = -1;
 	join = NULL;
-	expanded = ft_strdup("\0");
-	if (!expanded)
-		return (NULL);
+	expanded = tmp_word;
 	while (to_expand[(*position)] != '\0')
 	{
-		if (to_expand[(*position)] == '"' && dq == -1 && sq == -1)
-		{
-			dq = 1;
-			(*position)++;
-		}
-		else if (to_expand[(*position)] == '\'' && dq == -1 && sq == -1)
-		{
-			sq = 1;
-			(*position)++;
-		}
+		ft_change_quote_state_begin(to_expand, &(*position), &sq, &dq);
 		if (to_expand[(*position)] == '\0')
-		{
-			if (join)
-				return (join);
-			free(expanded);
-			return (NULL);
-		}
-		if (dq == -1 && sq == -1)
-		{
-			if (to_expand[(*position)] == '$')
-			{
-				while (to_expand[(*position)] == '$')
-					(*position)++;
-				if (to_expand[(*position)] == '\0' || to_expand[(*position)] \
-				== '"' || to_expand[(*position)] == '\'')
-					anchor = (*position) - 1;
-				else
-					anchor = (*position);
-				while (to_expand[(*position)] != '\0' && \
-				to_expand[(*position)] != ' ' && to_expand[(*position)] != \
-				'\?' && to_expand[(*position)] != '$' && \
-				to_expand[(*position)] != '"' && to_expand[(*position)] != '\'')
-					(*position)++;
-				if (to_expand[(*position)] == '\?')
-					(*position)++;
-				tmp_word = ft_expand_var(shell, to_expand, anchor, \
-				&(*position));
-			}
-			else 
-			{
-				anchor = (*position);
-				while (to_expand[(*position)] != '\0' && \
-				to_expand[(*position)] != \
-				'$' && to_expand[(*position)] != '"' && \
-				to_expand[(*position)] != '\'')
-					(*position)++;
-				tmp_word = ft_expand_text(to_expand, anchor, &(*position));
-			}
-		}
-		else if (dq == 1 && sq == -1)
-		{
-			if (to_expand[(*position)] == '$')
-			{
-				while (to_expand[(*position)] == '$')
-					(*position)++;
-				if (to_expand[(*position)] == '\0' || to_expand[(*position)] \
-				== '"' || to_expand[(*position)] == '\'' || \
-				to_expand[(*position)] == ' ')
-					anchor = (*position) - 1;
-				else
-					anchor = (*position);
-				while (to_expand[(*position)] != '\0' && \
-				to_expand[(*position)] != ' ' && to_expand[(*position)] \
-				!= '\?' && to_expand[(*position)] != '$' && \
-				to_expand[(*position)] != '"' && to_expand[(*position)] != '\'')
-					(*position)++;
-				if (to_expand[(*position)] == '\?' || \
-				to_expand[(*position)] == '\'')
-					(*position)++;
-				tmp_word = ft_expand_var(shell, to_expand, \
-				anchor, &(*position));
-			}
-			else 
-			{
-				anchor = (*position);
-				while (to_expand[(*position)] != '\0' && \
-				to_expand[(*position)] != '$' && to_expand[(*position)] != '"' \
-				&& to_expand[(*position)] != '\'')
-					(*position)++;
-				if (to_expand[(*position)] == '\'')
-					(*position)++;
-				tmp_word = ft_expand_text(to_expand, anchor, &(*position));
-			}
-		}
-		else if (sq == 1)
-		{
-			anchor = (*position);
-			while (to_expand[(*position)] != '\0' \
-			&& to_expand[(*position)] != '\'')
-				(*position)++;
-			tmp_word = ft_expand_text(to_expand, anchor, &(*position));
-			sq *= -1;
-		}
-		else if (dq == 1 && sq == 1)
-		{
-			if (to_expand[(*position)] == '$')
-			{
-				while (to_expand[(*position)] == '$')
-					(*position)++;
-				if (to_expand[(*position)] == '\0' || to_expand[(*position)] \
-				== '"' || to_expand[(*position)] == '\'')
-					anchor = (*position) - 1;
-				else
-					anchor = (*position);
-				while (to_expand[(*position)] != '\0' && to_expand[(*position)] \
-				!= ' ' && to_expand[(*position)] != '\?' && \
-				to_expand[(*position)] != '$' && to_expand[(*position)] \
-				!= '"' && to_expand[(*position)] != '\'')
-					(*position)++;
-				if (to_expand[(*position)] == '\?')
-					(*position)++;
-				tmp_word = ft_expand_var(shell, to_expand, anchor, \
-				&(*position));
-			}
-			else 
-			{
-				anchor = (*position);
-				while (to_expand[(*position)] != '\0' && to_expand[(*position)] \
-				!= '$' && to_expand[(*position)] != '"' \
-				&& to_expand[(*position)] != '\'')
-					(*position)++;
-				tmp_word = ft_expand_text(to_expand, anchor, &(*position));
-			}
-		}
-		if (to_expand[(*position)] == '"' && dq == 1)
-		{
-			dq = -1;
-			(*position)++;
-		}
-		else if (to_expand[(*position)] == '\'' && sq == 1)
-		{
-			sq = -1;
-			(*position)++;
-		}
+			return(ft_join_not_null(join, expanded));
+		tmp_word = ft_test_change_state(shell, to_expand, &(*position), &sq, &dq);
 		if (!tmp_word)
 			join = NULL;
 		else
@@ -209,7 +76,10 @@ int	ft_exp_redir(t_shell *shell, t_cmd *tmp_cmd)
 	while (tmp_redir)
 	{
 		position = 0;
-		tmp_word = ft_exp_command(shell, tmp_redir->token_str, &position);
+		tmp_word = ft_strdup("");
+		if (!tmp_word)
+			return (0);
+		tmp_word = ft_exp_command(shell, tmp_word, tmp_redir->token_str, &position);
 		if (!tmp_word)
 			ft_delete_redir_invalid(tmp_cmd, tmp_redir);
 		tmp_redir->token_str = tmp_word;
@@ -233,9 +103,13 @@ int	ft_expander(t_shell *shell)
 		arg_count = 1;
 		while (tmp_command->sim_cmd[arg_count])
 		{
+			tmp_word = ft_strdup("");
+			if (!tmp_word)
+				return (0);
 			position = 0;
-			tmp_word = ft_exp_command(shell, \
+			tmp_word = ft_exp_command(shell, tmp_word, \
 			tmp_command->sim_cmd[arg_count], &position);
+			free(tmp_command->sim_cmd[arg_count]);
 			tmp_command->sim_cmd[arg_count] = tmp_word;
 			arg_count++;
 		}

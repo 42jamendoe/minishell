@@ -51,6 +51,8 @@ MANDATORY = ft_isalpha.c \
 			ft_putendl_fd.c \
 			ft_putnbr_fd.c \
 			ft_cstr.c \
+			ft_some_char_in_str.c \
+			ft_ignore_equal.c \
 			
 BONUS =		ft_lstnew.c \
 			ft_lstadd_front.c \

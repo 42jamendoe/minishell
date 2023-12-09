@@ -80,3 +80,11 @@ int	ft_check_function(char *str)
 	else
 		return (-1);
 }
+
+void	ft_init_count_redir(t_cmd *tmp_cmd)
+{
+	tmp_cmd->in = 0;
+	tmp_cmd->out = 0;
+	tmp_cmd->redir = NULL;
+	tmp_cmd->next = NULL;
+}

@@ -26,6 +26,10 @@ long long	ft_atoll(const char *str);
 void		ft_bzero(void *s, size_t n);
 void		*ft_calloc(size_t nmemb, size_t size);
 int			ft_cstr(char *str, char c);
+int	ft_some_char_in_str(const char *str, int index, const char \
+*char_list, int to_end);
+int	ft_ignore_equal(const char *str, int index, const char \
+*char_list);
 int			ft_isalnum(int c);
 int			ft_isalpha(int c);
 int			ft_isascii(int c);
