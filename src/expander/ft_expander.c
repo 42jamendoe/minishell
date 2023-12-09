@@ -27,7 +27,7 @@ int *position)
 	{
 		ft_change_quote_state_begin(to_expand, &(*position), &sq, &dq);
 		if (to_expand[(*position)] == '\0')
-			return(ft_join_not_null(join, expanded));
+			return (ft_join_not_null(join, expanded));
 		tmp_word = ft_test_change_state(shell, to_expand, &(*position), &sq, &dq);
 		if (!tmp_word)
 			join = NULL;

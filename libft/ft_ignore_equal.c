@@ -14,8 +14,8 @@
 int	ft_ignore_equal(const char *str, int index, const char \
 *char_list)
 {
-	int i;
-	int anchor;
+	int	i;
+	int	anchor;
 
 	i = 0;
 	anchor = index;
@@ -28,7 +28,7 @@ int	ft_ignore_equal(const char *str, int index, const char \
 			if (str[index] == char_list[i])
 				index++;
 			else
-				break;
+				break ;
 		}
 		i++;
 	}

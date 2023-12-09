@@ -11,32 +11,27 @@
 /* ************************************************************************** */
 #include "../includes/libft.h"
 
-int	ft_some_char_in_str(const char *str, int index, const char \
+int	ft_some_char_in_str(char *str, int index, char \
 *char_list, int to_end)
 {
-	int i;
-	int anchor;
+	int	i;
 
-	i = 0;
-	anchor = index;
-	if (!char_list || !str)
-		return (0);
 	while (str[index] != '\0')
 	{
-	while (char_list[i] != '\0')
-	{
-		index =	anchor;
-
-			if (str[index] == char_list[i])
-				return(index);
-			if (to_end == 1)
-				index++;
-			else
-				break;
+		i = 0;
+		while ((char_list[i]) != '\0')
+		{
+			if (str[index] == char_list[i]) 
+				return (index);
+			i++;
 		}
-		i++;
+		if (to_end == 0)
+			break ;
+		index++;
 	}
-	return (index);
+	if (to_end == 1)
+		return (index);
+	return (0);
 }
 /*
 The  ft_some_char_in_str() function search any char of the list in the
