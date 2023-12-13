@@ -139,12 +139,12 @@ int				ft_handle_left_side(t_shell *shell, t_cmd *tmp_cmd, \
 int tmp_pipe[2], int backup[2]);
 int				ft_handle_middle_in_left_side(t_shell *shell, \
 t_cmd *tmp_cmd, int tmp_pipe[2]);
-int				ft_handle_middle_left_side(t_shell *shell, \
+int				ft_handle_middle_left_side(t_shell *shell, t_cmd *tmp_cmd, \
 int tmp_pipe[2], int backup[2]);
 int				ft_handle_middle_right_side(t_shell *shell, \
 t_cmd *tmp_cmd, int tmp_pipe[2], int backup[2]);
 int				ft_handle_right_side(t_shell *shell, \
-t_cmd *tmp_cmd, int tmp_pipe[2]);
+t_cmd *tmp_cmd, int tmp_pipe[2], int backup[2]);
 int				ft_run_builtin(t_shell *shell, t_cmd *tmp_cmd);
 char			**ft_get_paths(t_shell *shell);
 void			ft_fork(t_shell *shell, t_cmd *tmp_cmd);

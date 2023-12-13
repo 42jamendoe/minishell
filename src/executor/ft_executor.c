@@ -16,7 +16,7 @@ int tmp_pipe[2], int backup[2])
 {
 	if (ft_handle_left_side(shell, tmp_cmd, tmp_pipe, backup) || \
 	ft_handle_middle_right_side(shell, tmp_cmd, tmp_pipe, backup) || \
-	ft_handle_right_side(shell, tmp_cmd, tmp_pipe) \
+	ft_handle_right_side(shell, tmp_cmd, tmp_pipe, backup) \
 	|| ft_run_command(shell, tmp_cmd))
 	{
 		g_status = 1;

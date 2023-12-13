@@ -99,7 +99,7 @@ int tmp_pipe[2], int backup[2])
 	}
 	else if (tmp_cmd->prev_has_redirout)
 	{
-		if (ft_handle_middle_left_side(shell, tmp_pipe, backup))
+		if (ft_handle_middle_left_side(shell, tmp_cmd, tmp_pipe, backup))
 		{
 			ft_clean_prompt(shell);
 			return (EXIT_FAILURE);
