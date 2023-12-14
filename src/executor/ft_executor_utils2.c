@@ -77,33 +77,9 @@ int	ft_run_command(t_shell *shell, t_cmd *tmp_cmd)
 	!shell->command_list->redir && shell->cmd_nbr == 1)
 	{
 		ft_run_builtin(shell, tmp_cmd);
-		close(STDIN_FILENO);
-		close(STDOUT_FILENO);
 	}
 	else
 		ft_fork(shell, tmp_cmd);
 	return (EXIT_SUCCESS);
 }
 
-int	ft_handle_left_side_noredir(t_shell *shell, t_cmd *tmp_cmd, \
-int tmp_pipe[2], int backup[2])
-{
-	if ((!tmp_cmd->order_id || !tmp_cmd->prev_has_redirout))
-	{
-		if (ft_handle_middle_in_left_side(shell, tmp_cmd, \
-		tmp_pipe))
-		{
-			ft_clean_prompt(shell);
-			return (EXIT_FAILURE);
-		}
-	}
-	else if (tmp_cmd->prev_has_redirout)
-	{
-		if (ft_handle_middle_left_side(shell, tmp_cmd, tmp_pipe, backup))
-		{
-			ft_clean_prompt(shell);
-			return (EXIT_FAILURE);
-		}
-	}
-	return (EXIT_SUCCESS);
-}

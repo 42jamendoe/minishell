@@ -132,19 +132,15 @@ int anchor, int *position);
 char			*ft_get_env_value(char *env);
 int				ft_run_executor(t_shell *shell, t_cmd *tmp_cmd, \
 int tmp_pipe[2], int backup[2]);
-int				ft_prepare_executor(t_shell *shell, int backup[2]);
-int				ft_finish_executor(t_shell *shell, int backup[2]);
+int				ft_prepare_executor(t_shell *shell, t_cmd *tmp_cmd, \
+int backup[2]);
+int				ft_finish_executor(t_shell *shell, t_cmd *tmp_cmd, \
+int backup[2]);
 int				ft_executor(t_shell *shell);
 int				ft_handle_left_side(t_shell *shell, t_cmd *tmp_cmd, \
-int tmp_pipe[2], int backup[2]);
-int				ft_handle_middle_in_left_side(t_shell *shell, \
-t_cmd *tmp_cmd, int tmp_pipe[2]);
-int				ft_handle_middle_left_side(t_shell *shell, t_cmd *tmp_cmd, \
-int tmp_pipe[2], int backup[2]);
-int				ft_handle_middle_right_side(t_shell *shell, \
-t_cmd *tmp_cmd, int tmp_pipe[2], int backup[2]);
+int tmp_pipe[2]);
 int				ft_handle_right_side(t_shell *shell, \
-t_cmd *tmp_cmd, int tmp_pipe[2], int backup[2]);
+t_cmd *tmp_cmd, int tmp_pipe[2]);
 int				ft_run_builtin(t_shell *shell, t_cmd *tmp_cmd);
 char			**ft_get_paths(t_shell *shell);
 void			ft_fork(t_shell *shell, t_cmd *tmp_cmd);
@@ -228,6 +224,7 @@ char *to_expand, int *position, int quotes[2]);
 char			*ft_join_not_null(char *join, char *expanded);
 int				ft_loop_tmp_word(t_shell *shell);
 int				ft_handle_left_side_noredir(t_shell *shell, t_cmd *tmp_cmd, \
-int tmp_pipe[2], int backup[2]);
-
+int tmp_pipe[2]);
+int				ft_handle_right_side_noredir(t_shell *shell, t_cmd *tmp_cmd, \
+int tmp_pipe[2]);
 #endif
