@@ -24,7 +24,9 @@ int tmp_pipe[2])
 			ft_clean_prompt(shell);
 			return (EXIT_FAILURE);
 		}
-		else if (dup2(tmp_pipe[0], STDIN_FILENO) < 0)
+		if (tmp_cmd->order_id)
+			close (STDIN_FILENO);
+		if (dup2(tmp_pipe[0], STDIN_FILENO) < 0)
 		{
 			if (tmp_cmd->order_id)
 				close(tmp_pipe[1]);
@@ -53,23 +55,21 @@ tmp_pipe))
 int	ft_handle_left_side_noredir(t_shell *shell, t_cmd *tmp_cmd, \
 int tmp_pipe[2])
 {
-	if (tmp_cmd->order_id)
+	if (tmp_cmd->order_id || (!tmp_cmd->order_id && tmp_cmd->in))
 	{
-		if (!tmp_cmd->prev_has_redirout)
-		{
-			if (dup2(tmp_pipe[0], STDIN_FILENO) < 0)
+		close(STDIN_FILENO);
+		if (dup2(tmp_pipe[0], STDIN_FILENO) < 0)
 			{
 				ft_clean_prompt(shell);
 				return (EXIT_FAILURE);
 			}
 			close(tmp_pipe[0]);
-		}
 	}
 	return (EXIT_SUCCESS);
 }
 
 int	ft_handle_right_side(t_shell *shell, t_cmd *tmp_cmd, \
-int tmp_pipe[2])
+int tmp_pipe[2], int backup[2])
 {
 	if (tmp_cmd->out)
 	{
@@ -81,27 +81,38 @@ int tmp_pipe[2])
 			ft_clean_prompt(shell);
 			return (EXIT_FAILURE);
 		}
+		close(tmp_pipe[1]);
 	}
 	else
 	{
 		if (ft_handle_right_side_noredir(shell, tmp_cmd, \
-tmp_pipe))
+tmp_pipe, backup))
 			return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
 }
 
 int	ft_handle_right_side_noredir(t_shell *shell, t_cmd *tmp_cmd, \
-int tmp_pipe[2])
+int tmp_pipe[2], int backup[2])
 {
-	if (tmp_cmd->order_id != shell->cmd_nbr - 1)
+	close(STDOUT_FILENO);
+	if (tmp_cmd->order_id != shell->cmd_nbr - 1 || ((tmp_cmd->order_id == shell->cmd_nbr - 1) && tmp_cmd->out))
+	{
+		if (dup2(tmp_pipe[1], STDOUT_FILENO) < 0)
 		{
-			if (dup2(tmp_pipe[0], STDIN_FILENO) < 0)
-			{
-				ft_clean_prompt(shell);
-				return (EXIT_FAILURE);
-			}
-			close(tmp_pipe[0]);
+			ft_clean_prompt(shell);
+			return (EXIT_FAILURE);
 		}
+		close(tmp_pipe[1]);
+	}
+	else
+	{
+		if (dup2(backup[1], STDOUT_FILENO) < 0)
+		{
+			ft_clean_prompt(shell);
+			return (EXIT_FAILURE);
+		}
+		close(backup[1]);
+	}
 	return (EXIT_SUCCESS);
 }
