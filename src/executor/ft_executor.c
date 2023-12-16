@@ -14,14 +14,14 @@
 int	ft_run_executor(t_shell *shell, t_cmd *tmp_cmd, \
 int tmp_pipe[2], int backup[2])
 {
-	int end;
+	int	end;
 
 	end = 0;
 	if (ft_handle_left_side(shell, tmp_cmd, tmp_pipe))
 		end = 1;
-	if (ft_handle_right_side(shell, tmp_cmd, tmp_pipe, backup))
+	if (ft_handle_right_side(shell, tmp_cmd, tmp_pipe, backup) && !end)
 		end = 1;
-	if (ft_run_command(shell, tmp_cmd))
+	if (ft_run_command(shell, tmp_cmd) && !end)
 		end = 1;
 	if (end)
 	{
@@ -51,7 +51,7 @@ int	ft_prepare_executor(t_shell *shell, int backup[2])
 	return (EXIT_SUCCESS);
 }
 
-int	ft_finish_executor(t_shell *shell, t_cmd *tmp_cmd, int backup[2])
+int	ft_finish_executor(t_shell *shell, t_cmd *tmp_cmd, int backup[2], int reset)
 {
 	close(STDIN_FILENO);
 	if (dup2(backup[0], STDIN_FILENO) < 0)
@@ -61,7 +61,8 @@ int	ft_finish_executor(t_shell *shell, t_cmd *tmp_cmd, int backup[2])
 		return (EXIT_FAILURE);
 	}
 	close(backup[0]);
-	if (tmp_cmd->order_id && tmp_cmd->order_id == shell->cmd_nbr - 1 && tmp_cmd->out)
+	if ((tmp_cmd->order_id && tmp_cmd->order_id == \
+	shell->cmd_nbr - 1 && tmp_cmd->out) || reset)
 	{
 		close(STDOUT_FILENO);
 		if (dup2(backup[1], STDOUT_FILENO) < 0)
@@ -71,8 +72,8 @@ int	ft_finish_executor(t_shell *shell, t_cmd *tmp_cmd, int backup[2])
 			ft_putendl_fd("error: memmory aloocation", STDERR_FILENO);
 			return (EXIT_FAILURE);
 		}
-	close(backup[1]);
-}
+		close(backup[1]);
+	}
 	return (EXIT_SUCCESS);
 }
 
@@ -87,20 +88,25 @@ int	ft_executor(t_shell *shell)
 	tmp_cmd = shell->command_list;
 	if (ft_prepare_executor(shell, backup))
 		return (EXIT_FAILURE);
-	while (tmp_cmd)
+	else
 	{
-		if (ft_run_executor(shell, tmp_cmd, tmp_pipe, backup))
+		while (tmp_cmd)
 		{
-			ft_finish_executor(shell, tmp_cmd, backup);
-			return (EXIT_FAILURE);
+			if (ft_run_executor(shell, tmp_cmd, tmp_pipe, backup))
+			{
+				if (!WTERMSIG(status))
+					g_status = status >> 8;
+				ft_finish_executor(shell, tmp_cmd, backup, 1);
+				return (EXIT_FAILURE);
+			}
+			if (!tmp_cmd->next)
+				break ;
+			tmp_cmd = tmp_cmd->next;
 		}
-		if (!tmp_cmd->next)
-			break ;
-		tmp_cmd = tmp_cmd->next;
 	}
 	waitpid(-1, &status, 0);
-	ft_finish_executor(shell, tmp_cmd, backup);
+	ft_finish_executor(shell, tmp_cmd, backup, 0);
 	if (!WTERMSIG(status))
 		g_status = status >> 8;
-	return (g_status);
+	return (EXIT_SUCCESS);
 }

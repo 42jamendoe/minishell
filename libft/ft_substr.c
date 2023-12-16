@@ -37,7 +37,8 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	return (sp);
 }
 /*Function name:	ft_substr
-Prototype:			char *ft_substr(char const *s, unsigned int start, size_t len);
+Prototype:			char *ft_substr(char const *s, \
+unsigned int start, size_t len);
 Turn in files: 		-
 Parameters:			s: The string from which to create the substring.
 					start: The start index of the substring in the string ’s’.

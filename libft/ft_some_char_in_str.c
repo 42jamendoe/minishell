@@ -21,7 +21,7 @@ int	ft_some_char_in_str(char *str, int index, char \
 		i = 0;
 		while ((char_list[i]) != '\0')
 		{
-			if (str[index] == char_list[i]) 
+			if (str[index] == char_list[i])
 				return (index);
 			i++;
 		}

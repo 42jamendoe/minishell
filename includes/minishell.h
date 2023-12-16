@@ -36,14 +36,16 @@
 
 extern int	g_status;
 
-typedef enum e_state{
+typedef enum e_state
+{
 	DEFAULT,
 	SQUOTE,
 	DQUOTE,
 	DQUOTEOPEN,
 }	t_state;
 
-typedef enum e_builtins{
+typedef enum e_builtins
+{
 	ECHO,
 	CD,
 	PWD,
@@ -53,7 +55,8 @@ typedef enum e_builtins{
 	EXIT
 }	t_builtins;
 
-typedef enum e_token_name{
+typedef enum e_token_name
+{
 	WORD,
 	PIPE,
 	LESS,
@@ -133,7 +136,8 @@ char			*ft_get_env_value(char *env);
 int				ft_run_executor(t_shell *shell, t_cmd *tmp_cmd, \
 int tmp_pipe[2], int backup[2]);
 int				ft_prepare_executor(t_shell *shell, int backup[2]);
-int				ft_finish_executor(t_shell *shell, t_cmd *tmp_cmd, int backup[2]);
+int				ft_finish_executor(t_shell *shell, t_cmd *tmp_cmd, \
+int backup[2], int reset);
 int				ft_executor(t_shell *shell);
 int				ft_handle_left_side(t_shell *shell, t_cmd *tmp_cmd, \
 int tmp_pipe[2]);

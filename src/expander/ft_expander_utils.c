@@ -27,7 +27,7 @@ char	*ft_expand_dollar_sign_00(t_shell *shell, char *str, int *index)
 			(*index)++;
 		tmp_word = ft_expand_var(shell, str, anchor, &(*index));
 	}
-	else 
+	else
 	{
 		anchor = (*index);
 		(*index) = ft_some_char_in_str(str, (*index), "$\"\'", 1);
@@ -52,7 +52,7 @@ char	*ft_expand_dollar_sign_01(t_shell *shell, char *str, int *index)
 			(*index)++;
 		tmp_word = ft_expand_var(shell, str, anchor, &(*index));
 	}
-	else 
+	else
 	{
 		anchor = (*index);
 		(*index) = ft_some_char_in_str(str, (*index), "$\"\'", 1);
@@ -90,7 +90,7 @@ char	*ft_expand_dollar_sign_11(t_shell *shell, char *str, int *index)
 		(*index) += ft_some_char_in_str(str, (*index), "?", 0);
 		tmp_word = ft_expand_var(shell, str, anchor, &(*index));
 	}
-	else 
+	else
 	{
 		anchor = (*index);
 		(*index) += ft_some_char_in_str(str, (*index), "$\"\'", 1);

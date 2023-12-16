@@ -70,8 +70,10 @@ void	ft_fork(t_shell *shell, t_cmd *tmp_cmd)
 		exit (EXIT_SUCCESS);
 	}
 	else
-	if (tmp_cmd->order_id == shell->cmd_nbr - 1)
-		waitpid(cmd, NULL, 0);
+	{
+		if (tmp_cmd->order_id == shell->cmd_nbr - 1)
+			waitpid(cmd, NULL, 0);
+	}
 }
 
 int	ft_run_command(t_shell *shell, t_cmd *tmp_cmd)
@@ -85,4 +87,3 @@ int	ft_run_command(t_shell *shell, t_cmd *tmp_cmd)
 		ft_fork(shell, tmp_cmd);
 	return (EXIT_SUCCESS);
 }
-

@@ -39,7 +39,7 @@ int	ft_process_file(t_cmd *current_command, int input, int i)
 		close(input);
 	if (access(current_command->redir->token_str, R_OK) < 0)
 	{
-		g_status = 1;
+		g_status = 2;
 		ft_putstr_fd(current_command->redir->token_str, STDERR_FILENO);
 		ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
 		return (-1);

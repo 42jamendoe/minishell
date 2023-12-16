@@ -38,7 +38,8 @@ char	*ft_strmapi(char const *s, char (*f)(unsigned int, char))
 }
 /*
 Function name 		ft_strmapi
-Prototype 			char *ft_strmapi(char const *s, char (*f)(unsigned int, char));
+Prototype 			char *ft_strmapi(char const *s, 
+char (*f)(unsigned int, char));
 Turn in files 		-
 Parameters 			s: The string on which to iterate.
 					f: The function to apply to each character.

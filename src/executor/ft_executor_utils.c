@@ -41,7 +41,8 @@ int tmp_pipe[2])
 tmp_pipe))
 			return (EXIT_FAILURE);
 	}
-	if (tmp_cmd->order_id != shell->cmd_nbr - 1 || ((tmp_cmd->order_id == shell->cmd_nbr - 1) && tmp_cmd->out))
+	if (tmp_cmd->order_id != shell->cmd_nbr - 1 || \
+	((tmp_cmd->order_id == shell->cmd_nbr - 1) && tmp_cmd->out))
 	{
 		if (pipe(tmp_pipe) < 0)
 		{
@@ -59,11 +60,11 @@ int tmp_pipe[2])
 	{
 		close(STDIN_FILENO);
 		if (dup2(tmp_pipe[0], STDIN_FILENO) < 0)
-			{
-				ft_clean_prompt(shell);
-				return (EXIT_FAILURE);
-			}
-			close(tmp_pipe[0]);
+		{
+			ft_clean_prompt(shell);
+			return (EXIT_FAILURE);
+		}
+		close(tmp_pipe[0]);
 	}
 	return (EXIT_SUCCESS);
 }
@@ -95,7 +96,8 @@ tmp_pipe, backup))
 int	ft_handle_right_side_noredir(t_shell *shell, t_cmd *tmp_cmd, \
 int tmp_pipe[2], int backup[2])
 {
-	if (tmp_cmd->order_id != shell->cmd_nbr - 1 || ((tmp_cmd->order_id == shell->cmd_nbr - 1) && tmp_cmd->out))
+	if (tmp_cmd->order_id != shell->cmd_nbr - 1 || \
+	((tmp_cmd->order_id == shell->cmd_nbr - 1) && tmp_cmd->out))
 	{
 		close(STDOUT_FILENO);
 		if (dup2(tmp_pipe[1], STDOUT_FILENO) < 0)
@@ -105,7 +107,8 @@ int tmp_pipe[2], int backup[2])
 		}
 		close(tmp_pipe[1]);
 	}
-	else if (tmp_cmd->order_id && ((tmp_cmd->order_id == shell->cmd_nbr - 1) && !tmp_cmd->out))
+	else if (tmp_cmd->order_id && ((tmp_cmd->order_id == \
+	shell->cmd_nbr - 1) && !tmp_cmd->out))
 	{
 		close(STDOUT_FILENO);
 		if (dup2(backup[1], STDOUT_FILENO) < 0)
