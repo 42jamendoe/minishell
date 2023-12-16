@@ -71,8 +71,8 @@ int	ft_finish_executor(t_shell *shell, t_cmd *tmp_cmd, int backup[2])
 			ft_putendl_fd("error: memmory aloocation", STDERR_FILENO);
 			return (EXIT_FAILURE);
 		}
-	}
 	close(backup[1]);
+}
 	return (EXIT_SUCCESS);
 }
 
@@ -98,7 +98,7 @@ int	ft_executor(t_shell *shell)
 			break ;
 		tmp_cmd = tmp_cmd->next;
 	}
-	waitpid(-1, &g_status, 0);
+	waitpid(-1, &status, 0);
 	ft_finish_executor(shell, tmp_cmd, backup);
 	if (!WTERMSIG(status))
 		g_status = status >> 8;

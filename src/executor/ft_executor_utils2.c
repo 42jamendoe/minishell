@@ -71,7 +71,7 @@ void	ft_fork(t_shell *shell, t_cmd *tmp_cmd)
 	}
 	else
 	if (tmp_cmd->order_id == shell->cmd_nbr - 1)
-		waitpid(cmd, &g_status, 0);
+		waitpid(cmd, NULL, 0);
 }
 
 int	ft_run_command(t_shell *shell, t_cmd *tmp_cmd)
