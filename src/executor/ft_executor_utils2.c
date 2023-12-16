@@ -69,6 +69,9 @@ void	ft_fork(t_shell *shell, t_cmd *tmp_cmd)
 		close(STDOUT_FILENO);
 		exit (EXIT_SUCCESS);
 	}
+	else
+	if (tmp_cmd->order_id == shell->cmd_nbr - 1)
+		waitpid(cmd, &g_status, 0);
 }
 
 int	ft_run_command(t_shell *shell, t_cmd *tmp_cmd)

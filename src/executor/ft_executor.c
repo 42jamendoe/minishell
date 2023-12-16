@@ -98,8 +98,8 @@ int	ft_executor(t_shell *shell)
 			break ;
 		tmp_cmd = tmp_cmd->next;
 	}
+	waitpid(-1, &g_status, 0);
 	ft_finish_executor(shell, tmp_cmd, backup);
-	waitpid(-1, &status, 0);
 	if (!WTERMSIG(status))
 		g_status = status >> 8;
 	return (g_status);
