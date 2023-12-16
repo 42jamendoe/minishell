@@ -14,21 +14,13 @@
 int	ft_run_executor(t_shell *shell, t_cmd *tmp_cmd, \
 int tmp_pipe[2], int backup[2])
 {
-	int	end;
-
-	end = 0;
 	if (ft_handle_left_side(shell, tmp_cmd, tmp_pipe))
-		end = 1;
-	if (ft_handle_right_side(shell, tmp_cmd, tmp_pipe, backup) && !end)
-		end = 1;
-	if (ft_run_command(shell, tmp_cmd) && !end)
-		end = 1;
-	if (end)
-	{
-		g_status = 1;
 		return (EXIT_FAILURE);
-	}
-	return (g_status);
+	if (ft_handle_right_side(shell, tmp_cmd, tmp_pipe, backup))
+		return (EXIT_FAILURE);
+	if (ft_run_command(shell, tmp_cmd))
+		return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
 }
 
 int	ft_prepare_executor(t_shell *shell, int backup[2])
@@ -94,8 +86,6 @@ int	ft_executor(t_shell *shell)
 		{
 			if (ft_run_executor(shell, tmp_cmd, tmp_pipe, backup))
 			{
-				if (!WTERMSIG(status))
-					g_status = status >> 8;
 				ft_finish_executor(shell, tmp_cmd, backup, 1);
 				return (EXIT_FAILURE);
 			}
@@ -103,10 +93,10 @@ int	ft_executor(t_shell *shell)
 				break ;
 			tmp_cmd = tmp_cmd->next;
 		}
+		waitpid(-1, &status, 0);
+		ft_finish_executor(shell, tmp_cmd, backup, 0);
+		if (!WTERMSIG(status))
+			g_status = status >> 8;
 	}
-	waitpid(-1, &status, 0);
-	ft_finish_executor(shell, tmp_cmd, backup, 0);
-	if (!WTERMSIG(status))
-		g_status = status >> 8;
 	return (EXIT_SUCCESS);
 }

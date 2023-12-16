@@ -101,9 +101,9 @@ int	ft_export(t_shell *shell, t_cmd *tmp_cmd)
 		indexes[0] = ft_list_lenght(shell);
 		indexes[1] = ft_validate_arg_export(tmp_cmd->sim_cmd);
 		if (indexes[1] < 0)
-			g_status = 1;
+			return (-1);
 		else
 			ft_export_var(shell, tmp_cmd, indexes);
 	}
-	return (g_status);
+	return (EXIT_SUCCESS);
 }
