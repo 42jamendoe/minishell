@@ -67,6 +67,7 @@ int	ft_cd(t_shell *shell, t_cmd *tmp_cmd)
 
 	if (ft_count_arg_sim_cmd(tmp_cmd->sim_cmd) > 1)
 	{
+		g_status = 1;
 		ft_putendl_fd("minishell: cd: too many arguments", STDERR_FILENO);
 		return (EXIT_FAILURE);
 	}
@@ -81,6 +82,7 @@ int	ft_cd(t_shell *shell, t_cmd *tmp_cmd)
 		directory = tmp_cmd->sim_cmd[1];
 	if (!directory || chdir(directory))
 	{
+		g_status = 1;
 		ft_print_error_cd(directory);
 		return (EXIT_FAILURE);
 	}

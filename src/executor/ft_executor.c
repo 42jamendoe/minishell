@@ -93,7 +93,18 @@ int	ft_executor(t_shell *shell)
 				break ;
 			tmp_cmd = tmp_cmd->next;
 		}
-		waitpid(-1, &status, 0);
+		while (wait(&status) > 0)
+		{
+			// Processar o status de cada processo filho
+			if (WIFEXITED(status))
+			{
+				write(STDERR_FILENO, "processo\n", sizeof("processo\n"));// Processo filho terminou normalmente
+			}else
+			{
+				// Processo filho terminou com um erro
+			}
+		}
+		//waitpid(-1, &status, 0);
 		ft_finish_executor(shell, tmp_cmd, backup, 0);
 		if (!WTERMSIG(status))
 			g_status = status >> 8;

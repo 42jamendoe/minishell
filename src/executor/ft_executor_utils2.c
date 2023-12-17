@@ -16,11 +16,11 @@ int	ft_run_builtin(t_shell *shell, t_cmd *tmp_cmd)
 	if (tmp_cmd->function_name == 1)
 		g_status = ft_echo(tmp_cmd);
 	else if (tmp_cmd->function_name == 2)
-		g_status = ft_cd(shell, tmp_cmd);
+		return (ft_cd(shell, tmp_cmd));
 	else if (tmp_cmd->function_name == 3)
 		g_status = ft_pwd();
 	else if (tmp_cmd->function_name == 4)
-		g_status = ft_export(shell, tmp_cmd);
+		return(ft_export(shell, tmp_cmd));
 	else if (tmp_cmd->function_name == 5)
 		g_status = ft_unset(shell, tmp_cmd);
 	else if (tmp_cmd->function_name == 6)
@@ -29,7 +29,7 @@ int	ft_run_builtin(t_shell *shell, t_cmd *tmp_cmd)
 		ft_exit(shell, tmp_cmd);
 	else
 		return (-1);
-	return (g_status);
+	return (EXIT_SUCCESS);
 }
 
 char	**ft_get_paths(t_shell *shell)
@@ -80,9 +80,7 @@ int	ft_run_command(t_shell *shell, t_cmd *tmp_cmd)
 {
 	if (shell->command_list->function_name > 0 && \
 	!shell->command_list->redir && shell->cmd_nbr == 1)
-	{
-		ft_run_builtin(shell, tmp_cmd);
-	}
+		return (ft_run_builtin(shell, tmp_cmd));
 	else
 		ft_fork(shell, tmp_cmd);
 	return (EXIT_SUCCESS);

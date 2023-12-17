@@ -24,7 +24,7 @@ int tmp_pipe[2])
 			return (EXIT_FAILURE);
 		}
 		if (tmp_cmd->order_id)
-			close (STDIN_FILENO);
+			close(STDIN_FILENO);
 		if (dup2(tmp_pipe[0], STDIN_FILENO) < 0)
 		{
 			if (tmp_cmd->order_id)

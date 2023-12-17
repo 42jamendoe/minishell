@@ -224,7 +224,7 @@ int *index, int quotes[2]);
 char			*ft_test_change_state(t_shell *shell, \
 char *to_expand, int *position, int quotes[2]);
 char			*ft_join_not_null(char *join, char *expanded);
-int				ft_loop_tmp_word(t_shell *shell);
+int				ft_loop_tmp_word(t_shell *shell, t_cmd *tmp_cmd);
 int				ft_handle_left_side_noredir(t_shell *shell, t_cmd *tmp_cmd, \
 int tmp_pipe[2]);
 int				ft_handle_right_side_noredir(t_shell *shell, t_cmd *tmp_cmd, \
