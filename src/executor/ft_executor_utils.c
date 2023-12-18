@@ -19,13 +19,12 @@ int tmp_pipe[2])
 		tmp_pipe[0] = ft_check_redir_in(tmp_cmd);
 		if (tmp_pipe[0] == -1)
 		{
-			if (tmp_cmd->order_id)
-				close(tmp_pipe[1]);
+
 			ft_clean_prompt(shell);
 			return (EXIT_FAILURE);
 		}
 		if (tmp_cmd->order_id)
-			close (STDIN_FILENO);
+			close(STDIN_FILENO);
 		if (dup2(tmp_pipe[0], STDIN_FILENO) < 0)
 		{
 			if (tmp_cmd->order_id)

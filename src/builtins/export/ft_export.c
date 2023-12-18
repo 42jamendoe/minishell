@@ -49,9 +49,9 @@ int	ft_first_digit(char *arg)
 		ft_putstr_fd(arg, STDERR_FILENO);
 		ft_putendl_fd(": not a valid identifier", STDERR_FILENO);
 		arg[0] = '\0';
-		return (-1);
+		return (EXIT_FAILURE);
 	}
-	return (0);
+	return (EXIT_SUCCESS);
 }
 
 char	**ft_prepare_env_arg(char **env)
@@ -82,7 +82,7 @@ int	ft_validate_arg_export(char **env)
 	i = 1;
 	while (env[i])
 	{
-		if (ft_first_digit(env[i]) < 0)
+		if (ft_first_digit(env[i]))
 			return (-1);
 		i++;
 	}
@@ -101,9 +101,9 @@ int	ft_export(t_shell *shell, t_cmd *tmp_cmd)
 		indexes[0] = ft_list_lenght(shell);
 		indexes[1] = ft_validate_arg_export(tmp_cmd->sim_cmd);
 		if (indexes[1] < 0)
-			g_status = 1;
+			return (EXIT_FAILURE);
 		else
 			ft_export_var(shell, tmp_cmd, indexes);
 	}
-	return (g_status);
+	return (EXIT_SUCCESS);
 }

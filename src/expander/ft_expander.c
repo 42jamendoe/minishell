@@ -90,7 +90,7 @@ int	ft_exp_redir(t_shell *shell, t_cmd *tmp_cmd)
 	return (0);
 }
 
-int	ft_loop_tmp_word(t_shell *shell)
+int	ft_loop_tmp_word(t_shell *shell, t_cmd *tmp_cmd)
 {
 	int		arg_count;
 	int		position;
@@ -98,7 +98,7 @@ int	ft_loop_tmp_word(t_shell *shell)
 	t_cmd	*tmp_command;
 
 	arg_count = 1;
-	tmp_command = shell->command_list;
+	tmp_command = tmp_cmd;
 	while (tmp_command->sim_cmd[arg_count])
 	{
 		tmp_word = ft_strdup("");
@@ -127,7 +127,7 @@ int	ft_expander(t_shell *shell)
 	{
 		if (tmp_command->sim_cmd[1])
 		{
-			if (ft_loop_tmp_word(shell))
+			if (ft_loop_tmp_word(shell, tmp_command))
 				return (EXIT_FAILURE);
 		}
 		if (tmp_command->redir)
