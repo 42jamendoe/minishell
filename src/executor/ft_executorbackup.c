@@ -77,7 +77,7 @@ int	ft_finish_executor(t_shell *shell, t_cmd *tmp_cmd, int backup[2], int reset)
 	return (EXIT_SUCCESS);
 }
 
-int	ft_exec_utor(t_shell *shell)
+int	ft_executor(t_shell *shell)
 {
 	t_cmd	*tmp_cmd;
 	int		backup[2];
@@ -108,65 +108,5 @@ int	ft_exec_utor(t_shell *shell)
 	ft_finish_executor(shell, tmp_cmd, backup, 0);
 	if (!WTERMSIG(status))
 		g_status = status >> 8;
-	return (EXIT_SUCCESS);
-}
-
-int ft_executor(t_shell *shell)
-{
-	int tmpin = dup(STDIN_FILENO);
-	int tmpout = dup(STDOUT_FILENO);
-	int pipefd[2];
-	int input = dup(tmpin);
-	int output = dup(tmpout);
-	int ret;
-
-	t_cmd *cmd = shell->command_list;
-
-	while (cmd)
-	{
-		if (cmd->in)
-			input = ft_check_redir_in(cmd);
-		else
-			input = dup(tmpin);
-
-		if (cmd->order_id)
-		{
-			if (cmd->out)
-				output = ft_check_redir_out(cmd);
-			else
-				output = dup(tmpout);
-		}
-		else
-		{
-			pipe(pipefd);
-			output = pipefd[1];
-			input = pipefd[0];
-		}
-
-		ret = fork();
-		if (ret == 0)
-		{
-			dup2(input, STDIN_FILENO);
-			close(input);
-			dup2(output, STDOUT_FILENO);
-			close(output);
-
-			ft_run_command(shell, cmd);
-			exit(0); // Exit the child process
-		}
-		else
-		{
-			close(input);
-			close(output);
-			waitpid(ret, &g_status, 0);
-		}
-		if (!cmd->next)
-			break;
-		cmd = cmd->next; // Move to the next command in the list
-	}
-	dup2(tmpin, STDIN_FILENO);
-	dup2(tmpout, STDOUT_FILENO);
-	close(tmpin);
-	close(tmpout);
 	return (EXIT_SUCCESS);
 }
