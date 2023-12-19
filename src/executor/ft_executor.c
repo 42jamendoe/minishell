@@ -72,28 +72,23 @@ int	ft_finish_executor(t_shell *shell, t_cmd *tmp_cmd, int backup[2], int reset)
 int	ft_executor(t_shell *shell)
 {
 	t_cmd *cmd;
+	int fdpipe[2];
+	int input;
+	int ret = 0;
+	int output;
 
 	cmd = shell->command_list;
-	//save in/out
+
 	int tmpin = dup(STDIN_FILENO);
 	int tmpout = dup(STDOUT_FILENO);
-
-	//set the initial input
-	int input;
 	if (cmd->in)
 		input = ft_check_redir_in(cmd);
 	else
-	{
-		// Use default input
 		input = dup(tmpin);
-	}
-	int ret = 0;
-	int output;
 	while (cmd)
 	{
 		dup2(input, STDIN_FILENO);
 		close(input);
-
 		if (cmd->order_id == shell->cmd_nbr - 1)
 		{
 			if(cmd->out)
@@ -103,7 +98,6 @@ int	ft_executor(t_shell *shell)
 		}
 		else
 		{
-			int fdpipe[2];
 			pipe(fdpipe);
 			output = fdpipe[1];
 			input = fdpipe[0];
@@ -112,19 +106,22 @@ int	ft_executor(t_shell *shell)
 		close(output);
 		ret = fork();
 		if(ret == 0)
-		{
 			ft_execute_cmd(shell, cmd);
-		}
 		if (!cmd->next)
 			break ;
 		cmd = cmd->next;
+		//if (cmd->order_id)
+		close(STDIN_FILENO);
+		if (cmd->order_id != shell->cmd_nbr - 1)
+			close(STDOUT_FILENO);
+		else
+			close(fdpipe[1]);	
 	}
-	close(STDIN_FILENO);
-	close(STDOUT_FILENO);
 	dup2(tmpin,STDIN_FILENO);
-	dup2(tmpout,STDOUT_FILENO);
+	if (cmd->order_id != shell->cmd_nbr - 1)
+		dup2(tmpout,STDOUT_FILENO);
 	close(tmpin);
 	close(tmpout);
-	waitpid(ret, NULL, 0);
+	waitpid(-1, NULL, 0);
 	return (EXIT_SUCCESS);
 }

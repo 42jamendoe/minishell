@@ -87,6 +87,6 @@ void	ft_clean(t_shell *shell, int error)
 	free(shell->prompt);
 	if (error == 1)
 		ft_putendl_fd("minishell: error getting prompt", STDOUT_FILENO);
-	rl_clear_history();
+	// rl_clear_history();
 	exit (EXIT_FAILURE);
 }

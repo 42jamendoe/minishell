@@ -102,7 +102,7 @@ char	*ft_expand_dollar_sign_11(t_shell *shell, char *str, int *index)
 char	*ft_test_change_state(t_shell *shell, \
 char *to_expand, int *position, int quotes[2])
 {
-	char	*tmp_word;
+	char	*tmp_word = NULL;
 
 	if ((quotes[1]) == -1 && (quotes[0]) == -1)
 		tmp_word = ft_expand_dollar_sign_00(shell, to_expand, &(*position));
