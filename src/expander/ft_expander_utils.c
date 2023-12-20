@@ -20,6 +20,8 @@ char	*ft_expand_dollar_sign_00(t_shell *shell, char *str, int *index)
 	{
 		(*index) = ft_ignore_equal(str, (*index), "$");
 		anchor = (*index);
+		if (str[anchor] == '\0')
+			return (ft_strdup("$"));
 		if (ft_some_char_in_str(str, (*index), "\"\'", 0))
 			anchor = (*index) - 1;
 		(*index) = ft_some_char_in_str(str, (*index), " \?$\"\'", 1);
@@ -45,6 +47,8 @@ char	*ft_expand_dollar_sign_01(t_shell *shell, char *str, int *index)
 	{
 		(*index) = ft_ignore_equal(str, (*index), "$");
 		anchor = (*index);
+		if (str[anchor] == '\0')
+			return (ft_strdup("$"));
 		if (ft_some_char_in_str(str, (*index), "\"\' ", 0))
 			anchor = (*index) - 1;
 		(*index) = ft_some_char_in_str(str, (*index), " \?$\"\'", 1);
@@ -84,6 +88,8 @@ char	*ft_expand_dollar_sign_11(t_shell *shell, char *str, int *index)
 	{
 		(*index) = ft_ignore_equal(str, (*index), "$");
 		anchor = (*index);
+		if (str[anchor] == '\0')
+			return (ft_strdup("$"));
 		if (ft_some_char_in_str(str, (*index), "\"\'", 0))
 			anchor = (*index) - 1;
 		(*index) = ft_some_char_in_str(str, (*index), " \?$\"\'", 1);

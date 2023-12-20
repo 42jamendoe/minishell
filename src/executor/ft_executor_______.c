@@ -14,21 +14,13 @@
 int	ft_run_executor(t_shell *shell, t_cmd *tmp_cmd, \
 int tmp_pipe[2], int backup[2])
 {
-	int	end;
-
-	end = 0;
 	if (ft_handle_left_side(shell, tmp_cmd, tmp_pipe))
-		end = 1;
-	if (ft_handle_right_side(shell, tmp_cmd, tmp_pipe, backup) && !end)
-		end = 1;
-	if (ft_run_command(shell, tmp_cmd) && !end)
-		end = 1;
-	if (end)
-	{
-		g_status = 1;
 		return (EXIT_FAILURE);
-	}
-	return (g_status);
+	if (ft_handle_right_side(shell, tmp_cmd, tmp_pipe, backup))
+		return (EXIT_FAILURE);
+	if (ft_run_command(shell, tmp_cmd))
+		return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
 }
 
 int	ft_prepare_executor(t_shell *shell, int backup[2])
@@ -79,34 +71,57 @@ int	ft_finish_executor(t_shell *shell, t_cmd *tmp_cmd, int backup[2], int reset)
 
 int	ft_executor(t_shell *shell)
 {
-	t_cmd	*tmp_cmd;
-	int		backup[2];
-	int		tmp_pipe[2];
-	int		status;
+	t_cmd *cmd;
+	int fdpipe[2];
+	int input;
+	int ret = 0;
+	int output;
 
-	status = 0;
-	tmp_cmd = shell->command_list;
-	if (ft_prepare_executor(shell, backup))
-		return (EXIT_FAILURE);
+	cmd = shell->command_list;
+
+	int tmpin = dup(STDIN_FILENO);
+	int tmpout = dup(STDOUT_FILENO);
+	if (cmd->in)
+		input = ft_check_redir_in(cmd);
 	else
+		input = dup(tmpin);
+	while (cmd)
 	{
-		while (tmp_cmd)
+		dup2(input, STDIN_FILENO);
+		close(input);
+		if (cmd->order_id == shell->cmd_nbr - 1)
 		{
-			if (ft_run_executor(shell, tmp_cmd, tmp_pipe, backup))
-			{
-				if (!WTERMSIG(status))
-					g_status = status >> 8;
-				ft_finish_executor(shell, tmp_cmd, backup, 1);
-				return (EXIT_FAILURE);
-			}
-			if (!tmp_cmd->next)
-				break ;
-			tmp_cmd = tmp_cmd->next;
+			if(cmd->out)
+				output = ft_check_redir_out(cmd); 
+			else
+				output = dup(tmpout);
 		}
+		else
+		{
+			pipe(fdpipe);
+			output = fdpipe[1];
+			input = fdpipe[0];
+		}
+		dup2(output,STDOUT_FILENO);
+		close(output);
+		ret = fork();
+		if(ret == 0)
+			ft_execute_cmd(shell, cmd);
+		if (!cmd->next)
+			break ;
+		cmd = cmd->next;
+		//if (cmd->order_id)
+		close(STDIN_FILENO);
+		if (cmd->order_id != shell->cmd_nbr - 1)
+			close(STDOUT_FILENO);
+		else
+			close(fdpipe[1]);	
 	}
-	waitpid(-1, &status, 0);
-	ft_finish_executor(shell, tmp_cmd, backup, 0);
-	if (!WTERMSIG(status))
-		g_status = status >> 8;
+	dup2(tmpin,STDIN_FILENO);
+	if (cmd->order_id != shell->cmd_nbr - 1)
+		dup2(tmpout,STDOUT_FILENO);
+	close(tmpin);
+	close(tmpout);
+	waitpid(-1, NULL, 0);
 	return (EXIT_SUCCESS);
 }
