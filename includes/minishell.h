@@ -82,6 +82,7 @@ typedef struct s_cmd
 	int				in;
 	int				out;
 	int				prev_has_redirout;
+	pid_t			pid_cmd;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -145,8 +146,8 @@ int				ft_handle_right_side(t_shell *shell, \
 t_cmd *tmp_cmd, int tmp_pipe[2], int backup[2]);
 int				ft_run_builtin(t_shell *shell, t_cmd *tmp_cmd);
 char			**ft_get_paths(t_shell *shell);
-void			ft_fork(t_shell *shell, t_cmd *tmp_cmd);
-int				ft_run_command(t_shell *shell, t_cmd *tmp_cmd);
+void			ft_fork(t_shell *shell, t_cmd *tmp_cmd, int backup[2]);
+int				ft_run_command(t_shell *shell, t_cmd *tmp_cmd, int backup[2]);
 int				ft_check_token_valid(t_shell *shell);
 void			ft_check_token_end_last(t_shell *shell, int i);
 int				ft_check_token_end(t_shell *shell);

@@ -55,14 +55,14 @@ char	**ft_get_paths(t_shell *shell)
 	return (NULL);
 }
 
-void	ft_fork(t_shell *shell, t_cmd *tmp_cmd)
+void	ft_fork(t_shell *shell, t_cmd *tmp_cmd, int backup[2])
 {
-	pid_t	cmd;
+	int status;
 
-	cmd = fork();
-	if (cmd < 0)
+	tmp_cmd->pid_cmd = fork();
+	if (tmp_cmd->pid_cmd < 0)
 		ft_clean(shell, 1);
-	if (cmd == 0)
+	if (tmp_cmd->pid_cmd == 0)
 	{
 		ft_execute_cmd(shell, tmp_cmd);
 		close(STDIN_FILENO);
@@ -72,16 +72,21 @@ void	ft_fork(t_shell *shell, t_cmd *tmp_cmd)
 	else
 	{
 		if (tmp_cmd->order_id == shell->cmd_nbr - 1)
-			waitpid(cmd, NULL, 0);
+		{
+			(void)backup;
+			//ft_finish_executor(shell, tmp_cmd, backup, 0);
+			waitpid (tmp_cmd->pid_cmd, &status, 0);
+			g_status = status >> 8;
+		}
 	}
 }
 
-int	ft_run_command(t_shell *shell, t_cmd *tmp_cmd)
+int	ft_run_command(t_shell *shell, t_cmd *tmp_cmd, int backup[2])
 {
 	if (shell->command_list->function_name > 0 && \
 	!shell->command_list->redir && shell->cmd_nbr == 1)
 		return (ft_run_builtin(shell, tmp_cmd));
 	else
-		ft_fork(shell, tmp_cmd);
+		ft_fork(shell, tmp_cmd, backup);
 	return (EXIT_SUCCESS);
 }
