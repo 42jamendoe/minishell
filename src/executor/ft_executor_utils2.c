@@ -20,7 +20,7 @@ int	ft_run_builtin(t_shell *shell, t_cmd *tmp_cmd)
 	else if (tmp_cmd->function_name == 3)
 		g_status = ft_pwd();
 	else if (tmp_cmd->function_name == 4)
-		return(ft_export(shell, tmp_cmd));
+		return (ft_export(shell, tmp_cmd));
 	else if (tmp_cmd->function_name == 5)
 		g_status = ft_unset(shell, tmp_cmd);
 	else if (tmp_cmd->function_name == 6)
@@ -57,7 +57,7 @@ char	**ft_get_paths(t_shell *shell)
 
 void	ft_fork(t_shell *shell, t_cmd *tmp_cmd, int backup[2])
 {
-	int status;
+	int	status;
 
 	tmp_cmd->pid_cmd = fork();
 	if (tmp_cmd->pid_cmd < 0)
@@ -74,7 +74,6 @@ void	ft_fork(t_shell *shell, t_cmd *tmp_cmd, int backup[2])
 		if (tmp_cmd->order_id == shell->cmd_nbr - 1)
 		{
 			(void)backup;
-			//ft_finish_executor(shell, tmp_cmd, backup, 0);
 			waitpid (tmp_cmd->pid_cmd, &status, 0);
 			g_status = status >> 8;
 		}

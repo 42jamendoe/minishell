@@ -24,11 +24,7 @@ int tmp_pipe[2], int backup[2])
 	if (!end && ft_run_command(shell, tmp_cmd, backup))
 		end = 2;
 	if (end)
-	{
-		// if (end == 1)
-		// 	ft_clean_prompt(shell);
 		return (EXIT_FAILURE);
-	}
 	return (EXIT_SUCCESS);
 }
 
@@ -83,8 +79,8 @@ int	ft_executor(t_shell *shell)
 	t_cmd	*tmp_cmd;
 	int		backup[2];
 	int		tmp_pipe[2];
-	//int		status;
 	pid_t	w_pid;
+	int		status;
 
 	tmp_cmd = shell->command_list;
 	if (ft_prepare_executor(shell, backup))
@@ -113,28 +109,21 @@ int	ft_executor(t_shell *shell)
 	{
 		while (tmp_cmd->order_id < shell->cmd_nbr - 1)
 		{
-			int status;
 			if (tmp_cmd->pid_cmd == 0)
 				tmp_cmd = tmp_cmd->next;
 			else
 			{
-			w_pid = waitpid (tmp_cmd->pid_cmd, &status, 0);
-
-			if (w_pid > 0)
-			{
-				// Processo filho com PID child_pid terminou
-				if (tmp_cmd->next)
-					break;
-				tmp_cmd = tmp_cmd->next;
-			}
-			else if (w_pid == -1)
-			{
-				// Tratar erro ao esperar por processos filhos
-				perror ("waitpid");
-				return (EXIT_FAILURE);
-			}
-			if (!WTERMSIG(status) && WEXITSTATUS(status))
-				g_status = status >> 8;
+				w_pid = waitpid (tmp_cmd->pid_cmd, &status, 0);
+				if (w_pid > 0)
+				{
+					if (tmp_cmd->next)
+						break ;
+					tmp_cmd = tmp_cmd->next;
+				}
+				else if (w_pid == -1)
+					return (EXIT_FAILURE);
+				if (!WTERMSIG(status) && WEXITSTATUS(status))
+					g_status = status >> 8;
 			}
 		}
 	}

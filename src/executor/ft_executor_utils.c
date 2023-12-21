@@ -18,17 +18,13 @@ int tmp_pipe[2])
 	{
 		tmp_pipe[0] = ft_check_redir_in(tmp_cmd);
 		if (tmp_pipe[0] == -1)
-		{
-			//ft_clean_prompt(shell);
 			return (EXIT_FAILURE);
-		}
 		if (tmp_cmd->order_id)
 			close(STDIN_FILENO);
 		if (dup2(tmp_pipe[0], STDIN_FILENO) < 0)
 		{
 			if (tmp_cmd->order_id)
 				close(tmp_pipe[1]);
-			//ft_clean_prompt(shell);
 			return (EXIT_FAILURE);
 		}
 		close(tmp_pipe[0]);
@@ -59,10 +55,7 @@ int tmp_pipe[2])
 	{
 		close(STDIN_FILENO);
 		if (dup2(tmp_pipe[0], STDIN_FILENO) < 0)
-		{
-			//ft_clean_prompt(shell);
 			return (EXIT_FAILURE);
-		}
 		close(tmp_pipe[0]);
 	}
 	return (EXIT_SUCCESS);
@@ -77,14 +70,10 @@ int tmp_pipe[2], int backup[2])
 		if (tmp_pipe[1] < 0)
 		{
 			close(tmp_pipe[0]);
-			//close(tmp_pipe[1]);
 			return (EXIT_FAILURE);
 		}
 		if (dup2(tmp_pipe[1], STDOUT_FILENO) < 0)
-		{
-			//ft_clean_prompt(shell);
 			return (EXIT_FAILURE);
-		}
 		close(tmp_pipe[1]);
 	}
 	else
@@ -104,10 +93,7 @@ int tmp_pipe[2], int backup[2])
 	{
 		close(STDOUT_FILENO);
 		if (dup2(tmp_pipe[1], STDOUT_FILENO) < 0)
-		{
-			//ft_clean_prompt(shell);
 			return (EXIT_FAILURE);
-		}
 		close(tmp_pipe[1]);
 	}
 	else if (tmp_cmd->order_id && ((tmp_cmd->order_id == \
@@ -115,10 +101,7 @@ int tmp_pipe[2], int backup[2])
 	{
 		close(STDOUT_FILENO);
 		if (dup2(backup[1], STDOUT_FILENO) < 0)
-		{
-			//ft_clean_prompt(shell);
 			return (EXIT_FAILURE);
-		}
 		close(backup[1]);
 	}
 	return (EXIT_SUCCESS);
