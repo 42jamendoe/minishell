@@ -47,7 +47,7 @@ void	ft_clean_char(char **char_to_clean)
 	int	i;
 
 	i = 0;
-	if (char_to_clean[i])
+	if (char_to_clean)
 	{
 		while (char_to_clean[i])
 		{
@@ -87,6 +87,6 @@ void	ft_clean(t_shell *shell, int error)
 	free(shell->prompt);
 	if (error == 1)
 		ft_putendl_fd("minishell: error getting prompt", STDOUT_FILENO);
-	// rl_clear_history();
+	rl_clear_history();
 	exit (EXIT_FAILURE);
 }

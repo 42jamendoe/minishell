@@ -103,7 +103,7 @@ void			ft_config_signals(t_shell *shell);
 int				ft_process_heredoc(t_cmd *current_command, int input, int i);
 int				ft_process_file(t_cmd *current_command, int input, int i);
 int				ft_check_redir_in(t_cmd *current_command);
-int				ft_check_redir_out(t_cmd *crt_cmd);
+int				ft_check_redir_out(t_cmd *crt_cmd, int tmp_pipe[2]);
 void			ft_build_redirection_list(t_shell *shell, t_cmd *command);
 void			ft_build_simple_command(t_shell *shell, int i, t_cmd *command);
 void			ft_create_command(t_shell *shell, t_cmd *command);

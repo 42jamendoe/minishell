@@ -99,6 +99,7 @@ int	ft_parser(t_shell *shell)
 		if (!tmp_cmd)
 			return (ft_clean_memory(shell, NO_FD));
 		tmp_cmd->order_id = i;
+		tmp_cmd->pid_cmd = 0;
 		tmp_cmd->arg_nbr = ft_command_args_number(shell->token_list) + 1;
 		tmp_cmd->sim_cmd = (char **) malloc (sizeof(char *) \
 		* tmp_cmd->arg_nbr);

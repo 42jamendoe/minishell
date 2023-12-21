@@ -99,4 +99,8 @@ void	ft_execute_cmd(t_shell *shell, t_cmd *tmp_cmd)
 			exit(127);
 		}
 	}
+	// else
+	// 	{
+	// 		ft_putendl_fd("minishell: No such file or directory", STDERR_FILENO);
+	// 	}
 }

@@ -76,12 +76,12 @@ int	ft_check_redir_in(t_cmd *current_command)
 	return (input);
 }
 
-int	ft_check_redir_out(t_cmd *crt_cmd)
+int	ft_check_redir_out(t_cmd *crt_cmd, int tmp_pipe[2])
 {
 	int	i;
 	int	output;
 
-	output = 1;
+	output = tmp_pipe[1];
 	i = 0;
 	if (!crt_cmd->redir)
 		return (1);
@@ -97,6 +97,13 @@ int	ft_check_redir_out(t_cmd *crt_cmd)
 			else
 				output = open(crt_cmd->redir->token_str, \
 				O_CREAT | O_WRONLY | O_APPEND, 0644);
+		}
+		if (output < 0)
+		{
+			ft_putendl_fd("minishell: No such file or directory", STDERR_FILENO);
+			close(tmp_pipe[1]);
+			g_status = 0;
+			return (-1);
 		}
 		i++;
 		crt_cmd->redir = crt_cmd->redir->next;
