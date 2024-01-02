@@ -81,7 +81,7 @@ int	ft_check_redir_out(t_cmd *crt_cmd, int tmp_pipe[2])
 	int	i;
 	int	output;
 
-	output = tmp_pipe[1];
+	//output = tmp_pipe[1];
 	i = 0;
 	if (!crt_cmd->redir)
 		return (1);
@@ -100,7 +100,7 @@ int	ft_check_redir_out(t_cmd *crt_cmd, int tmp_pipe[2])
 		}
 		if (output < 0)
 		{
-			ft_putendl_fd("minishell: No such file or directory", 2);
+			ft_putendl_fd("minishell: No such file or directory", STDERR_FILENO);
 			close(tmp_pipe[1]);
 			g_status = 0;
 			return (-1);

@@ -9,32 +9,67 @@
 /*   Updated: 2023/08/08 20:20:50 by luaraujo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "../includes/minishell.h"
+#include "../../includes/minishell.h"
 
-int	ft_run_executor(t_shell *shell, t_cmd *tmp_cmd, \
-int tmp_pipe[2], int backup[2])
+int ft_fork_(t_shell *shell, t_cmd *cmd, int pipe_fd[2], int backup[2])
 {
-	int	end;
+	pid_t cmd;
 
-	end = 0;
-	if (ft_handle_left_side(shell, tmp_cmd, tmp_pipe))
-		end = 1;
-	if (!end && ft_handle_right_side(shell, tmp_cmd, tmp_pipe, backup))
-		end = 1;
-	if (!end && ft_run_command(shell, tmp_cmd, backup))
-		end = 2;
-	if (end)
-		return (EXIT_FAILURE);
+	cmd = fork();
+	if (cmd == 0)
+	{
+		close(pipe_fd[1]);
+		close(backup[0]);
+		close(backup[1]);
+		ft_execute_command_(pipe_fd[0]);
+		return (EXIT_SUCCESS);
+	}
+	close(pipe_fd[1]);
 	return (EXIT_SUCCESS);
 }
 
-int	ft_prepare_executor(t_shell *shell, int backup[2])
+int ft_handle_right_side_(t_shell *shell, t_cmd *cmd, int pipe_fd[2])
+{
+	if (pipe(pipe_fd) < 0)
+	{
+		ft_clean_prompt(shell);
+		return (EXIT_FAILURE);
+	}
+	close(STDOUT_FILENO);
+	if (dup2(pipe_fd[1], STDOUT_FILENO) < 0)
+	{
+		ft_clean_prompt(shell);
+		ft_putendl_fd("minishell: pipe_ft[1]: bad file descriptor", STDERR_FILENO);
+		return (EXIT_FAILURE);
+	}
+	return (EXIT_SUCCESS);
+}
+
+t_cmd *ft_handle_left_side_(t_shell *shell, t_cmd *cmd, int input)
+{
+	while (input < 0)
+	{
+		if (cmd->in)
+			input = ft_check_redir_in(cmd);
+		else
+		{
+			input = dup(STDIN_FILENO);
+			if (input < 0)
+			ft_putendl_fd("minishell: input: bad file descriptor", STDERR_FILENO);
+		}
+		if (input < 0 && cmd->next)
+			cmd = cmd->next;
+	}
+	return (cmd);
+}
+
+int ft_prepare_executor_(t_shell *shell, int backup[2])
 {
 	backup[0] = dup(STDIN_FILENO);
 	if (backup[0] < 0)
 	{
 		ft_clean_prompt(shell);
-		ft_putendl_fd("error: memmory aloocation", STDERR_FILENO);
+		ft_putendl_fd("minishell: backup[0]: bad file descriptor", STDERR_FILENO);
 		return (EXIT_FAILURE);
 	}
 	backup[1] = dup(STDOUT_FILENO);
@@ -42,90 +77,41 @@ int	ft_prepare_executor(t_shell *shell, int backup[2])
 	{
 		close(backup[0]);
 		ft_clean_prompt(shell);
-		ft_putendl_fd("error: memmory aloocation", STDERR_FILENO);
+		ft_putendl_fd("minishell: backup[1]: bad file descriptor", STDERR_FILENO);
 		return (EXIT_FAILURE);
 	}
 	return (EXIT_SUCCESS);
 }
 
-int	ft_finish_executor(t_shell *shell, t_cmd *tmp_cmd, int backup[2], int reset)
+int ft_run_executor_(t_shell *shell, t_cmd *cmd, int input)
 {
-	close(STDIN_FILENO);
-	if (dup2(backup[0], STDIN_FILENO) < 0)
-	{
-		ft_clean_prompt(shell);
-		ft_putendl_fd("error: memmory aloocation", STDERR_FILENO);
+	int	backup[2];
+	int	pipe_fd[2];
+
+	if (ft_prepare_executor_(shell, backup))
 		return (EXIT_FAILURE);
-	}
-	close(backup[0]);
-	if ((tmp_cmd->order_id && tmp_cmd->order_id == \
-	shell->cmd_nbr - 1 && tmp_cmd->out) || reset)
+	ft_handle_right_side_(shell, cmd, pipe_fd);
+	ft_fork_(shell, cmd, pipe_fd, backup);
+	//ft_handle_left_side_(shell, cmd, input);
+}
+
+int ft_executor(t_shell *shell)
+{
+	t_cmd *cmd;
+	int input;
+
+	cmd = shell->command_list;
+	input = -1;
+	while (cmd)
 	{
-		close(STDOUT_FILENO);
-		if (dup2(backup[1], STDOUT_FILENO) < 0)
-		{
-			close(backup[0]);
-			ft_clean_prompt(shell);
-			ft_putendl_fd("error: memmory aloocation", STDERR_FILENO);
+		cmd = ft_handle_left_side_(shell, cmd, input);
+		if (!cmd)
+			break ;
+		if (ft_run_executor_(shell, cmd, input))
 			return (EXIT_FAILURE);
-		}
-		close(backup[1]);
-	}
-	return (EXIT_SUCCESS);
-}
-
-int	ft_executor(t_shell *shell)
-{
-	t_cmd	*tmp_cmd;
-	int		backup[2];
-	int		tmp_pipe[2];
-	pid_t	w_pid;
-	int		status;
-
-	tmp_cmd = shell->command_list;
-	if (ft_prepare_executor(shell, backup))
-		return (EXIT_FAILURE);
-	else
-	{
-		while (tmp_cmd)
-		{
-			if (ft_run_executor(shell, tmp_cmd, tmp_pipe, backup))
-			{
-				if (!tmp_cmd->order_id && !tmp_cmd->next)
-				{
-					ft_finish_executor(shell, tmp_cmd, backup, 1);
-					return (EXIT_FAILURE);
-				}
-			}
-			if (!tmp_cmd->next)
-				break ;
-			tmp_cmd = tmp_cmd->next;
-		}
-	}
-	ft_finish_executor(shell, tmp_cmd, backup, 0);
-	tmp_cmd = shell->command_list;
-	if (!(shell->command_list->function_name > 0 && \
-	!shell->command_list->redir && shell->cmd_nbr == 1))
-	{
-		while (tmp_cmd->order_id < shell->cmd_nbr - 1)
-		{
-			if (tmp_cmd->pid_cmd == 0)
-				tmp_cmd = tmp_cmd->next;
-			else
-			{
-				w_pid = waitpid (tmp_cmd->pid_cmd, &status, 0);
-				if (w_pid > 0)
-				{
-					if (tmp_cmd->next)
-						break ;
-					tmp_cmd = tmp_cmd->next;
-				}
-				else if (w_pid == -1)
-					return (EXIT_FAILURE);
-				if (!WTERMSIG(status) && WEXITSTATUS(status))
-					g_status = status >> 8;
-			}
-		}
+		if (!cmd->next)
+			break ;
+		cmd = cmd->next;
 	}
 	return (EXIT_SUCCESS);
 }
