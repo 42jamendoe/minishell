@@ -230,4 +230,6 @@ int				ft_handle_left_side_noredir(t_shell *shell, t_cmd *tmp_cmd, \
 int tmp_pipe[2]);
 int				ft_handle_right_side_noredir(t_shell *shell, t_cmd *tmp_cmd, \
 int tmp_pipe[2], int backup[2]);
+char	*get_sys_binpath(t_shell *shell, t_cmd *tmp_cmd);
+void	ft_run_cmd_lib(t_shell *shell);
 #endif

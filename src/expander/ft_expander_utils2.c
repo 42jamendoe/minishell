@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 #include "../../includes/minishell.h"
-#include "../../includes/minishell.h"
 
 char	*ft_expand_text(char *arg, int anchor, int *position)
 {

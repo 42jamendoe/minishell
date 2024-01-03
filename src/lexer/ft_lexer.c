@@ -9,7 +9,7 @@
 /*   Updated: 2023/08/08 20:20:50 by luaraujo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "../includes/minishell.h"
+#include "../../includes/minishell.h"
 
 int	ft_create_token(t_shell *shell, int i, t_token_name name)
 {

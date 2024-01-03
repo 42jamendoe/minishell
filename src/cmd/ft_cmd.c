@@ -11,6 +11,30 @@
 /* ************************************************************************** */
 #include "../includes/minishell.h"
 
+char	**ft_get_paths(t_shell *shell)
+{
+	int		i;
+	char	*paths_char;
+	char	**splited;
+
+	i = 0;
+	splited = NULL;
+	while (shell->env[i])
+	{
+		if (shell->env[i] && ft_strncmp(shell->env[i], "PATH=", 5))
+			i++;
+		else
+		{
+			paths_char = ft_substr(shell->env[i], 5, \
+			ft_strlen(shell->env[i]) - 5);
+			splited = ft_split(paths_char, ':');
+			return (splited);
+		}
+	}
+	return (NULL);
+}
+
+
 char	*get_sys_binpath(t_shell *shell, t_cmd *tmp_cmd)
 {
 	int		i;

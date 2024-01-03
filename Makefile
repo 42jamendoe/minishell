@@ -42,7 +42,7 @@ OBJ = $(SRC:%.c=$(SRCD)/%.o)
 all: $(LIBFT) $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -Llibft -lft -lreadline  -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJ) -Llibft -lft -lreadline -o $(NAME)
 
 $(LIBFT):	
 	$(MAKE) -C libft

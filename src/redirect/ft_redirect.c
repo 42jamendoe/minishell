@@ -9,7 +9,7 @@
 /*   Updated: 2023/08/08 20:20:50 by luaraujo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "../includes/minishell.h"
+#include "../../includes/minishell.h"
 
 int	ft_process_heredoc(t_cmd *current_command, int input, int i)
 {

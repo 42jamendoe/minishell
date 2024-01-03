@@ -9,7 +9,7 @@
 /*   Updated: 2023/07/17 21:41:35 by jamendoe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "../includes/minishell.h"
+#include "../../includes/minishell.h"
 
 int	ft_change_quotes_state(int c, int sqt, int dqt)
 {
