@@ -35,9 +35,9 @@ void	ft_get_exit_arg(char *arg)
 {
 	if (ft_check_exit_arg(arg))
 	{
-		ft_putstr_fd(": ", STDERR_FILENO);
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
 		ft_putstr_fd(arg, STDERR_FILENO);
-		ft_putstr_fd(": numeric argument required", STDERR_FILENO);
+		ft_putendl_fd(": numeric argument required", STDERR_FILENO);
 		g_status = 2;
 	}
 	else
