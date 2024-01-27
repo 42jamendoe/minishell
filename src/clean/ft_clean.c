@@ -32,10 +32,10 @@ void	ft_clean_token(t_token *token_to_clean)
 	{
 		while (cl_token->next)
 		{
-			if (cl_token->next)
-				cl_token_anchor = cl_token->next;
 			if (cl_token->token_str)
 				free(cl_token->token_str);
+			if (cl_token->next)
+				cl_token_anchor = cl_token->next;
 			free(cl_token);
 			cl_token = cl_token_anchor;
 		}
