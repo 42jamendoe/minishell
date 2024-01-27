@@ -32,6 +32,8 @@ void	ft_execute_cmd(t_shell *shell, t_cmd *tmp_cmd)
 			close(STDIN_FILENO);
 		if (tmp_cmd->order_id != shell->cmd_nbr - 1 || tmp_cmd->out)
 			close(STDOUT_FILENO);
+		if (shell->cmd_nbr == 1)
+			ft_putendl_fd("minishel: command not found", STDERR_FILENO);
 		exit(127);
 	}
 }
