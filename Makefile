@@ -1,7 +1,7 @@
 NAME = minishell
 LIBFT = ./libft/libft.a
-CC = gcc
-CFLAGS = -Wall -Wextra -Werror -g #-fsanitize=address
+CC = cc
+CFLAGS = -Wall -Wextra -Werror
 RM = rm -rf
 
 SRCD = ./src
