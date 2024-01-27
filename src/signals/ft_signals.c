@@ -11,15 +11,15 @@
 /* ************************************************************************** */
 #include "../../includes/minishell.h"
 
-void	fork_child(int sig)
-{
-	if (sig == SIGINT)
-	{
-		ft_putchar_fd('\n', STDOUT_FILENO);
-		g_status = 130;
-		exit(130);
-	}
-}
+// void	fork_child(int sig)
+// {
+// 	if (sig == SIGINT)
+// 	{
+// 		ft_putchar_fd('\n', STDOUT_FILENO);
+// 		g_status = 130;
+// 		exit(130);
+// 	}
+// }
 
 void	ft_handle_sigint(int sig)
 {
