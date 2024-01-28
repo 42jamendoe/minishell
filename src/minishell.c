@@ -64,7 +64,7 @@ int	main(int argc, char **argv, char **envp)
 	ft_prepare_env(&shell, envp);
 	while (1)
 	{
-		ft_config_signals(&shell);
+		ft_config_signals();
 		prompt_tmp = readline("minishell$ ");
 		if (!prompt_tmp)
 			exit(EXIT_FAILURE);

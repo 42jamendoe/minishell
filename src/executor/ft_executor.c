@@ -42,7 +42,7 @@ int	ft_run_other(t_shell *shell, t_cmd *cmd, int pipe_fd[2], int input)
 	cmd->pid_cmd = fork();
 	if (cmd->pid_cmd == 0)
 	{
-		signal(SIGINT, SIG_IGN);
+		signal(SIGINT, fork_child);
 		if (cmd->order_id != shell->cmd_nbr - 1)
 			ft_not_last_command(shell, pipe_fd);
 		if (cmd->order_id > 0)
@@ -50,7 +50,10 @@ int	ft_run_other(t_shell *shell, t_cmd *cmd, int pipe_fd[2], int input)
 		ft_handle_exec_red(shell, cmd, pipe_fd);
 	}
 	else
+	{
+		ft_config_signals_in_child();
 		input = ft_after_fork(shell, cmd, pipe_fd, input);
+	}
 	return (input);
 }
 
